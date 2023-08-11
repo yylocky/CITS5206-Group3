@@ -23,7 +23,7 @@
 1. Clone the repository
 
 ```bash
-git clone https://github.com/Erin27100/WebProject2.git
+https://github.com/ChangwuWu/CITS5206-Group3.git
 ```
 
 2. Set the environment
