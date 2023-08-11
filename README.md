@@ -29,7 +29,7 @@ https://github.com/ChangwuWu/CITS5206-Group3.git
 2. Set the environment
 
 ```bash
-xsource venv/bin/activate
+source venv/bin/activate
 export FLASK_APP=app.py
 pip install -r requirements.txt
 
@@ -43,7 +43,7 @@ flask db migrate
 flask db upgrade
 ```
 
-We have set a database test.db in the repository. If you want to use it, you can skip the above steps.
+We have set a test database app.db in the repository. If you want to use it, you can skip the above steps.
 
 3. Run the flask
 
