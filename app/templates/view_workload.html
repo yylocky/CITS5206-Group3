@@ -1,0 +1,141 @@
+{% extends "base.html" %} {% block title %} view_workload {% endblock %} {%
+block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/base.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/homepage.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/view_workload.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="content-wrapper">
+  <div class="homepage-box-container">
+    <div class="title">
+      <p>View Workload</p>
+    </div>
+
+    {% if not current_user.is_authenticated %}
+    <div class="login-box">
+      <h3>
+        <i class="fas fa-sign-in-alt"></i>
+        <a href="{{ url_for('login') }}">Log In</a>
+      </h3>
+      <h3>
+        <i class="fas fa-user-plus"></i>
+        <a href="{{ url_for('signup') }}">Sign Up</a>
+      </h3>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="workload-table">
+    <input type="text" class="filter-input" placeholder="Filter by Username" />
+    <input type="text" class="filter-input" placeholder="Filter by Email" />
+    <button class="export-button">
+      <i class="fas fa-file-export"></i>
+      Export CSV
+    </button>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.username}}</td>
+          <td>{{ user.email }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // Filter table
+  const filterInputs = document.querySelectorAll(".filter-input");
+  const rows = document.querySelectorAll(".workload-table tbody tr");
+
+  filterInputs.forEach((input) => {
+    input.addEventListener("input", () => {
+      applyFilter();
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        applyFilter();
+      }
+    });
+  });
+
+  function applyFilter() {
+    rows.forEach((row) => {
+      const columns = row.getElementsByTagName("td");
+      let shouldHideRow = false;
+
+      Array.from(columns).forEach((column, index) => {
+        if (
+          !column.innerText
+            .toLowerCase()
+            .includes(filterInputs[index].value.toLowerCase())
+        ) {
+          shouldHideRow = true;
+        }
+      });
+
+      if (shouldHideRow) {
+        row.style.display = "none";
+      } else {
+        row.style.display = "";
+      }
+    });
+  }
+
+  // Export CSV
+  const exportButton = document.querySelector(".export-button");
+
+  exportButton.addEventListener("click", () => {
+    exportToCSV();
+  });
+
+  function exportToCSV() {
+    const filteredRows = Array.from(rows).filter(
+      (row) => row.style.display !== "none"
+    );
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      encodeURI(generateCSVContent(filteredRows));
+
+    const link = document.createElement("a");
+    link.href = csvContent;
+    link.download = "filtered_data.csv";
+    link.click();
+  }
+
+  function generateCSVContent(rows) {
+    const headers = Array.from(
+      document.querySelectorAll(".workload-table th")
+    ).map((header) => header.textContent);
+    const rowsContent = rows.map((row) =>
+      Array.from(row.querySelectorAll("td"))
+        .map((cell) => cell.textContent)
+        .join(",")
+    );
+
+    return [headers.join(","), ...rowsContent].join("\n");
+  }
+</script>
+{% endblock %}
