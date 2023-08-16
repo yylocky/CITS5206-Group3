@@ -2,7 +2,7 @@
 block content %}
 <div class="container mt-5">
   <!-- Workload Assignment Section -->
-  <h3>Workload Assignment</h3>
+  <h3>Workload Assignment [HoS only]</h3>
   <div class="assignmentContainer">
     <div class="row mt-2 assignmentRow">
       <div class="col-2">
@@ -23,7 +23,7 @@ block content %}
           -->
         </select>
       </div>
-      <div class="col-3">
+      <div class="col-2">
         <label for="taskType" class="form-label">Task Type</label>
         <select class="form-select" id="taskType">
           {% for task in ["Uni Coordination", "Project Supervision",
@@ -32,7 +32,7 @@ block content %}
           {% endfor %}
         </select>
       </div>
-      <div class="col">
+      <div class="col-2">
         <label for="taskName" class="form-label">Task Name</label>
         <input type="text" class="form-control" id="taskName" required />
         <small class="form-text text-danger" style="display: none"
@@ -59,7 +59,7 @@ block content %}
       </div>
     </div>
     <button
-      class="btn btn-success mt-3 d-grid gap-2 col-6 mx-auto"
+      class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
       onclick="addAssignmentRow()"
     >
       Add Assignment
@@ -67,7 +67,7 @@ block content %}
   </div>
 
   <!-- File Upload Section -->
-  <h3 class="mt-5">File Upload</h3>
+  <h3 class="mt-5">File Upload [HoS / HoDs / Admin]</h3>
   <div class="uploadContainer">
     <div class="row mt-2 uploadRow">
       <div class="col-2">
@@ -91,11 +91,27 @@ block content %}
       </div>
     </div>
     <button
-      class="btn btn-success mt-3 d-grid gap-2 col-6 mx-auto"
+      class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
       onclick="addUploadRow()"
     >
       Add File
     </button>
+  </div>
+
+  <!-- Approval of Uploaded Assignment Section -->
+  <h3 class="mt-5">[TBC] Approval of Uploaded Assignment [HoS only]</h3>
+  <div class="approvalContainer">
+    {% for spreadsheet in ["Spreadsheet 1", "Spreadsheet 2", "Spreadsheet 3"] %}
+    <div class="row mt-2 approvalRow">
+      <div class="col-2">{{ spreadsheet }}</div>
+      <div class="col-1">
+        <button class="btn btn-primary">Download</button>
+      </div>
+      <div class="col">
+        <button class="btn btn-success">Approve</button>
+      </div>
+    </div>
+    {% endfor %}
   </div>
 </div>
 
@@ -125,7 +141,7 @@ block content %}
             -->
           </select>
         </div>
-        <div class="col-3">
+        <div class="col-2">
           <select class="form-select" id="taskType">
             {% for task in ["Uni Coordination", "Project Supervision",
             "Administration"] %}
@@ -133,7 +149,7 @@ block content %}
             {% endfor %}
           </select>
         </div>
-        <div class="col">
+        <div class="col-2">
           <input type="text" class="form-control" id="taskName" required />
           <small class="form-text text-danger" style="display: none"
             >Invalid input</small

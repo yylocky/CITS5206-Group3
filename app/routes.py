@@ -69,9 +69,9 @@ def signup():
 # decorator for assign page
 
 
-@app.route('/assign')
+@app.route('/assign_workload')
 def assign():
-    return render_template('assign.html', title='Assign Workload')
+    return render_template('assign_workload.html', title='Assign Workload')
 
 
 if __name__ == '__main__':
