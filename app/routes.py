@@ -48,6 +48,13 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
+# decorator for view_workload page
+@app.route('/view_workload')
+@login_required
+def view_workload():
+    # users=User.query.all() # Just using user table for mockup 
+    return render_template('view_workload.html', title='View Workload')#, users=users)
+
 # decorator for signup page
 
 
