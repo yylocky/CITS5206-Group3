@@ -47,8 +47,8 @@ def logout():
 @app.route('/view_workload')
 @login_required
 def view_workload():
-    users=User.query.all() # Just using user table for mockup
-    return render_template('view_workload.html', users=users, title='View Workload')
+    # users=User.query.all() # Just using user table for mockup 
+    return render_template('view_workload.html', title='View Workload')#, users=users)
 
 # decorator for signup page
 @app.route('/signup', methods=['GET', 'POST'])

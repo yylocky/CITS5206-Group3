@@ -38,13 +38,90 @@ block styles %}
   </div>
 
   <div class="workload-table">
-    <input type="text" class="filter-input" placeholder="Filter by Username" />
-    <input type="text" class="filter-input" placeholder="Filter by Email" />
-    <button class="export-button">
-      <i class="fas fa-file-export"></i>
-      Export CSV
-    </button>
+    <div class="filter-title">
+      <p>Filter</p>
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Department"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Task Type"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Task Name"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Staff Name"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Assigned Hours"
+      />
+
+      <button class="export-button">
+        <i class="fas fa-file-export"></i>
+        Export CSV
+      </button>
+    </div>
+    <!-- mockup dummy data -->
     <table>
+      <thead>
+        <tr>
+          <th>Department</th>
+          <th>Task Type</th>
+          <th>Task Name</th>
+          <th>Staff Name</th>
+          <th>Assigned Hours</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>CSSE</td>
+          <td>Uni Coordination</td>
+          <td>CITS1401</td>
+          <td>John</td>
+          <td>200</td>
+        </tr>
+        <tr>
+          <td>M&S</td>
+          <td>Project Supervision</td>
+          <td>Project or Unit name</td>
+          <td>Jenny</td>
+          <td>20</td>
+        </tr>
+        <tr>
+          <td>Physics</td>
+          <td>Administration</td>
+          <td>ABC Program Chair</td>
+          <td>Adam</td>
+          <td>30</td>
+        </tr>
+        <tr>
+          <td>CSSE</td>
+          <td>Uni Coordination</td>
+          <td>CITS1402</td>
+          <td>John</td>
+          <td>200</td>
+        </tr>
+        <tr>
+          <td>M&S</td>
+          <td>Project Supervision</td>
+          <td>Project or Unit name</td>
+          <td>James</td>
+          <td>20</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- <table>
       <thead>
         <tr>
           <th>Username</th>
@@ -60,7 +137,7 @@ block styles %}
         </tr>
         {% endfor %}
       </tbody>
-    </table>
+    </table> -->
   </div>
 </div>
 
