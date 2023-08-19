@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="content-container">
+  <div class="navigation">
+    <ul>
+      <li><a href="#" class="active">Dashboard</a></li>
+      <li><a href="#">Assign</a></li>
+      <li><a href="#">View</a></li>
+      <li><a href="#">Edit</a></li>
+      <li><a href="#">Log In</a></li>
+    </ul>
+  </div>
+  <div class="main-content">
+    <div class="top">
+      <div class="left">
+        <h1>Hello, Mark Reynolds</h1>
+        <p>Following is Your Workload summary</p>
+      </div>
+      <div class="right">
+        <img src="./images/icon1.svg" alt="">
+        <img src="./images/icon2.svg" alt="">
+        <img src="./images/user.svg" alt="">
+        <div class="userInfo">
+          <h2>Mark Reynolds <img src="./images/show.svg" alt=""></h2>
+          <p>markreynolds@uwa.edu.au</p>
+        </div>
+      </div>
+    </div>
+    <div class="bottomContent">
+      <table class="table">
+        <tr>
+          <th>Department</th>
+          <th>Task Type</th>
+          <th>Task Name</th>
+          <th>Assigned Hours</th>
+        </tr>
+        <tr>
+          <td>M&S</td>
+          <td>Project Supervision</td>
+          <td>CITS5206</td>
+          <td>10</td>
+        </tr>
+        <!-- More rows here -->
+      </table>
+    </div>
+  </div>
+</div>
+<footer>
+  <p id="footer-text">This is a CITS5206 project by @UWA</p>
+</footer>
+</body>
+</html>
+{% endblock %}
