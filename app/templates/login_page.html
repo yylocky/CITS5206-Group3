@@ -15,28 +15,28 @@
         <div class="v59_623"></div>
         <div class="v59_624"></div>
     </div>
-    <div class="v59_625">
-        <div class="v59_626">
-            <div class="v59_627"></div>
-            <span class="v59_628">Username</span>
-            <div class="v59_629">
-                <div class="v59_630"></div>
-                <div class="v59_631"></div>
-            </div>
-        </div>
-        <div class="v59_632">
-            <div class="v59_633"></div>
-            <span class="v59_634">password</span>
-            <div class="v59_635">
-                <div class="v59_636"></div>
-                <div class="v59_637"></div>
-            </div>
-        </div>
-        <div class="v59_638">
-            <div class="v59_639"></div>
-            <span class="v59_640">login</span>
-        </div>
-        <span class="v59_641">Forgot password?</span>
+    <form id="login-form" method="post">
+        <!--This is a hidden input field that contains a token to prevent CSRF attacks-->
+        {{ form.csrf_token }}
+        <p> <!--enter username-->
+            <label for="username">Username</label>
+            {{ form.username(size=20, class='login-input',placeholder='Enter your username', required=True) }}<br>
+            {% for error in form.username.errors %}
+                <span>[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <P> <!--enter password-->
+            <label for="password">Password</label>
+            {{ form.password(size=20, class='login-input',placeholder='Enter your password', required=True) }}<br>
+            {% for error in form.password.errors %}
+                <span>[{{ error }}]</span>
+            {% endfor %}
+        </P>
+        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        <p>{{ form.submit(class='login-btn') }}</p>
+        <!-- sign up link -->
+        <p> Haven't got an account? <a id="signup" href="{{ url_for('signup') }}">Sign Up Now</a></p>  
+    </form>
     </div>
     <div class="v59_643">
         <!-- Additional content goes here -->

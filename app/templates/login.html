@@ -28,6 +28,14 @@
             {% for error in form.password.errors %}
                 <span>[{{ error }}]</span>
             {% endfor %}
+        <P><!--dropdown menu-->
+          <label for="role">Select your role:</label>
+          <select id="role" class="role-dropdown">
+            <option value="head_of_school">Head of School</option>
+            <option value="heads_of_department">Heads of Department</option>
+            <option value="administrative_staff">Administrative Staff</option>
+            <option value="other_staff">Other Staff</option>
+          </select>
         </P>
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit(class='login-btn') }}</p>
