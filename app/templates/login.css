@@ -1,0 +1,73 @@
+/* Add your custom CSS styles here */
+
+/* Styles for the login box container */
+.login-box-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Styles for the login box */
+.login-box {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  width: 300px;
+}
+
+/* Styles for the login input fields */
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Styles for the login button */
+.login-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.login-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Styles for the sign-up link */
+#signup {
+  color: #007bff;
+  text-decoration: none;
+}
+
+#signup:hover {
+  text-decoration: underline;
+}
+
+/* Styles for the role dropdown */
+.role-dropdown {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #140a0a;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.role-dropdown:focus {
+  border-color: #007bff;
+}
