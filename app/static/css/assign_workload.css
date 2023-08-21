@@ -57,13 +57,13 @@ body {
   }
   
   .btn-primary {
-    background-color: #007bff;
+    background-color: rgb(48, 67, 180);
     color: white;
     border: none;
   }
   
   .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: rgb(48, 67, 180);
   }
   
   .btn-secondary {
@@ -113,13 +113,13 @@ body {
   }
   
   .assignmentRow button.btn-primary {
-    background-color: #007bff;
+    background-color: rgb(48, 67, 180);
     color: white;
     border: none;
   }
   
   .assignmentRow button.btn-primary:hover {
-    background-color: #0056b3;
+    background-color: rgb(48, 67, 180);
   }
   
   .assignmentRow button.btn-danger {
