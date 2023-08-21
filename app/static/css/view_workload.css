@@ -47,7 +47,7 @@ body {
 }
 
 .export-button {
-  background-color: rgb(48, 67, 180);
+  background-color: rgb(40,52,139);
   color: white;
   border: none;
   border-radius: 5px;
@@ -56,7 +56,7 @@ body {
 }
 
 .export-button:hover {
-  background-color: rgb(48, 67, 180);
+  background-color: rgb(40,52,139);
 }
 
 /* Table styles */
@@ -72,7 +72,7 @@ td {
 }
 
 th {
-  background-color: rgb(48, 67, 180);
+  background-color: rgb(40,52,139);
   color: white;
 }
 
