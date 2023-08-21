@@ -1,39 +1,40 @@
-{% extends "base.html" %}
-
-{% block title %}
-  Login
-{% endblock %}
-
-{% block styles %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-{% endblock %}
-
-{% block content %}
-  <div class="login-box-container">
-    <div class="login-box">
-      <form id="login-form" method="post">
-        <!--This is a hidden input field that contains a token to prevent CSRF attacks-->
-        {{ form.csrf_token }}
-        <p> <!--enter username-->
-            <label for="username">Username</label>
-            {{ form.username(size=20, class='login-input',placeholder='Enter your username', required=True) }}<br>
-            {% for error in form.username.errors %}
-                <span>[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <P> <!--enter password-->
-            <label for="password">Password</label>
-            {{ form.password(size=20, class='login-input',placeholder='Enter your password', required=True) }}<br>
-            {% for error in form.password.errors %}
-                <span>[{{ error }}]</span>
-            {% endfor %}
-        </P>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit(class='login-btn') }}</p>
-        <!-- sign up link -->
-        <p> Haven't got an account? <a id="signup" href="{{ url_for('signup') }}">Sign Up Now</a></p>  
-      </form>
-    </div>  
+{% extends "base.html" %} {% block title %} Login {% endblock %} {% block styles
+%}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/base.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/login.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="login-box-container">
+  <div class="login-box">
+    <form id="login-form" method="post">
+      <!--This is a hidden input field that contains a token to prevent CSRF attacks-->
+      {{ form.csrf_token }}
+      <p>
+        <!--enter username-->
+        <label for="username">Username</label>
+        {{ form.username(size=20, class='login-input',placeholder='Enter your
+        username', required=True) }}<br />
+        {% for error in form.username.errors %}
+        <span>[{{ error }}]</span>
+        {% endfor %}
+      </p>
+      <p>
+        <!--enter password-->
+        <label for="password">Password</label>
+        {{ form.password(size=20, class='login-input',placeholder='Enter your
+        password', required=True) }}<br />
+        {% for error in form.password.errors %}
+        <span>[{{ error }}]</span>
+        {% endfor %}
+      </p>
+      <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+      <p>{{ form.submit(class='login-btn') }}</p>
+    </form>
   </div>
+</div>
 {% endblock %}

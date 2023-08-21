@@ -41,8 +41,6 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 # decorator for logout page
-
-
 @app.route('/logout')
 def logout():
     logout_user()
@@ -55,30 +53,19 @@ def view_workload():
     # users=User.query.all() # Just using user table for mockup 
     return render_template('view_workload.html', title='View Workload')#, users=users)
 
-# decorator for signup page
-
-
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if current_user.is_authenticated:
-        flash('You are already logged in!')
-        return redirect(url_for('homepage'))
-    form = SignupForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations! You are now a registered user. Log in to start chatting!', 'success')
-        return redirect(url_for('login'))
-    return render_template('signup.html', title='Sign Up', form=form)
-
-# decorator for assign page
-
 
 @app.route('/assign_workload')
 def assign():
     return render_template('assign_workload.html', title='Assign Workload')
+
+@app.route('/edit_allocation_detail')
+def edit_allocation_detail():
+    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html', title='Dashboard')
+
 
 
 if __name__ == '__main__':
