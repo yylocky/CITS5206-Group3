@@ -1,82 +1,137 @@
- /* assign.css */
 /* Base styles */
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-/* Section styles */
-.assignmentContainer,
-.uploadContainer,
-.approvalContainer {
-  margin-top: 20px;
-}
-
-.assignmentRow,
-.uploadRow,
-.approvalRow {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  background-color: #f7f7f7;
-}
-
-.assignmentRow:last-child,
-.uploadRow:last-child,
-.approvalRow:last-child {
-  margin-bottom: 0;
-}
-
-.form-label {
-  font-weight: bold;
-}
-
-.form-select,
-.form-control {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.form-text {
-  color: red;
-}
-
-.btn {
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #ccc;
-  color: white;
-  border: none;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-}
-
-/* Additional styles can be added as needed */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Section styles */
+  .assignmentContainer,
+  .uploadContainer,
+  .approvalContainer {
+    margin-top: 20px;
+  }
+  
+  .assignmentRow,
+  .uploadRow,
+  .approvalRow {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #f7f7f7;
+  }
+  
+  .assignmentRow:last-child,
+  .uploadRow:last-child,
+  .approvalRow:last-child {
+    margin-bottom: 0;
+  }
+  
+  .form-label {
+    font-weight: bold;
+  }
+  
+  .form-select,
+  .form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-text {
+    color: red;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background-color: rgb(40,52,139);
+    color: white;
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: rgb(40,52,139);
+  }
+  
+  .btn-secondary {
+    background-color: #ccc;
+    color: white;
+    border: none;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+  }
+  
+  
+  /* Style for individual assignment rows */
+  .assignmentRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .assignmentRow > * {
+    flex: 1;
+    padding: 8px;
+  }
+  
+  .assignmentRow label {
+    flex-basis: 20%;
+    font-weight: bold;
+  }
+  
+  .assignmentRow input,
+  .assignmentRow select {
+    flex-basis: 20%;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .assignmentRow button {
+    flex-basis: 20%;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .assignmentRow button.btn-primary {
+    background-color: rgb(40,52,139);
+    color: white;
+    border: none;
+  }
+  
+  .assignmentRow button.btn-primary:hover {
+    background-color: rgb(40,52,139);
+  }
+  
+  .assignmentRow button.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+  }
+  
+  /* Remove the border and background from the container */
+  .assignmentContainer {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin-top: 20px;
+  }
