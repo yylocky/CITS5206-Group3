@@ -12,17 +12,10 @@ import random
 timezone = pytz.timezone("Australia/Perth")
 now = datetime.now(timezone)
 
-# decorator for homepage
-
-
-@app.route('/')
-@app.route('/homepage')
-def homepage():
-    return render_template('homepage.html', title='Home')
-
 # decorator for login page
 
 
+@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -36,7 +29,7 @@ def login():
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('homepage')
+            next_page = url_for('login')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -44,7 +37,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('homepage'))
+    return redirect(url_for('login'))
 
 # decorator for view_workload page
 @app.route('/view_workload')
