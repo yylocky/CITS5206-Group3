@@ -135,3 +135,36 @@ body {
     padding: 0;
     margin-top: 20px;
   }
+
+ /* 修改 "upload" 按钮的颜色 */
+.uploadRow button {
+  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
+  color: white; /* 新的文字颜色 */
+  border: none;
+}
+
+.uploadRow button:hover {
+  background-color: rgb(40, 52, 139);
+}
+
+/* 修改 "download" 按钮的颜色 */
+.downloadRow button {
+  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
+  color: white; /* 新的文字颜色 */
+  border: none;
+}
+
+.downloadRow button:hover {
+  background-color: rgb(40, 52, 139);
+}
+
+/* 修改 "assign" 按钮的颜色 */
+.assignmentRow button {
+  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
+  color: white; /* 新的文字颜色 */
+  border: none;
+}
+
+.assignmentRow button:hover {
+  background-color: rgb(40, 52, 139);
+}
