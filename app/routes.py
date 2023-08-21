@@ -15,11 +15,11 @@ now = datetime.now(timezone)
 # decorator for login page
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -48,14 +48,17 @@ def view_workload():
 
 
 @app.route('/assign_workload')
+@login_required
 def assign():
     return render_template('assign_workload.html', title='Assign Workload')
 
 @app.route('/edit_allocation_detail')
+@login_required
 def edit_allocation_detail():
     return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
     return render_template('dashboard.html', title='Dashboard')
 
