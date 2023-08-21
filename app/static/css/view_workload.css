@@ -1,75 +1,84 @@
-.workload-table {
-  margin-top: 20px;
+/* view_workload.css */
+/* Base styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-.workload-table table {
+.content-wrapper {
+  padding: 20px;
+}
+
+.homepage-box-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.login-box {
+  display: flex;
+  gap: 10px;
+}
+
+.workload-table {
+  background-color: #f7f7f7;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.filter-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.export-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.export-button:hover {
+  background-color: #0056b3;
+}
+
+/* Table styles */
+table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid #000;
 }
 
-.workload-table table th,
-.workload-table table td {
-  border: 1px solid #000;
+th,
+td {
   padding: 10px;
   text-align: left;
 }
 
-.workload-table th {
-  background-color: #253490;
-  color: #fff;
+th {
+  background-color: #007bff;
+  color: white;
 }
 
-.title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #253490;
+/* Font Awesome icons */
+.fas {
+  margin-right: 5px;
 }
 
-.filter-input {
-  width: 20%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-}
-
-.filter-input:focus {
-  outline: none;
-  border-color: #253490;
-}
-
-.export-button {
-  background-color: #253490;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-
-/* Style for the filter area */
-.filter-title {
-  background-color: #f2f2f2;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.filter-title p {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.filter-input {
-  margin: 5px 0;
-  padding: 10px;
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  font-size: 14px;
-}
+/* Additional styles can be added as needed */
