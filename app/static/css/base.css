@@ -1,0 +1,51 @@
+/* base.css */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #007bff;
+  padding: 10px;
+}
+
+nav ul {
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+}
+
+nav ul li {
+  margin: 0 20px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: white;
+}
+
+.flashes {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.flash-message {
+  background-color: #ffc107;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f7f7f7;
+}
+
+#footer-text {
+  font-size: 14px;
+}
+
+/* Additional styles can be added as needed */
