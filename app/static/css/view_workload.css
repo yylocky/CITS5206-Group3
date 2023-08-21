@@ -1,0 +1,84 @@
+/* view_workload.css */
+/* Base styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.content-wrapper {
+  padding: 20px;
+}
+
+.homepage-box-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.login-box {
+  display: flex;
+  gap: 10px;
+}
+
+.workload-table {
+  background-color: #f7f7f7;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.filter-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.export-button {
+  background-color: rgb(48, 67, 180);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.export-button:hover {
+  background-color: rgb(48, 67, 180);
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: rgb(48, 67, 180);
+  color: white;
+}
+
+/* Font Awesome icons */
+.fas {
+  margin-right: 5px;
+}
+
+/* Additional styles can be added as needed */

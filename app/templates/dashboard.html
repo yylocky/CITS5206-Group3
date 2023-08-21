@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% block title %}Dashboard{% endblock %}{% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/base.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/dashboard.css') }}"
+/>
+<div class="content-container">
+  <div class="main-content">
+    <div class="top">
+      <div class="left">
+        <h1>Hello, Mark Reynolds</h1>
+        <p>Following is Your Workload summary</p>
+      </div>
+      <div class="right">
+        <div class="userInfo">
+          <h2>Mark Reynolds<h2>
+          <p>markreynolds@uwa.edu.au</p>
+        </div>
+      </div>
+    </div>
+    <div class="bottomContent">
+      <table class="table">
+        <tr>
+          <th>Department</th>
+          <th>Task Type</th>
+          <th>Task Name</th>
+          <th>Assigned Hours</th>
+        </tr>
+        <tr>
+          <td>M&S</td>
+          <td>Project Supervision</td>
+          <td>CITS5206</td>
+          <td>10</td>
+        </tr>
+        <!-- More rows here -->
+      </table>
+    </div>
+  </div>
+</div>
+</html>
+{% endblock %}
