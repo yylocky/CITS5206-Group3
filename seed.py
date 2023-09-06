@@ -15,16 +15,16 @@ def seed_departments():
 
 def seed_users_with_roles():
     users_data = [
-        {'staff_number': 11111111, 'password': 'hospassword', 'role_name': 'HoS'},
-        {'staff_number': 22222222, 'password': 'hodpassword', 'role_name': 'HoD'},
-        {'staff_number': 33333333, 'password': 'staffpassword', 'role_name': 'Staff'},
-        {'staff_number': 44444444, 'password': 'adminpassword', 'role_name': 'Admin'},
+        {'username': 11111111, 'password': 'hospassword', 'role_name': 'HoS'},
+        {'username': 22222222, 'password': 'hodpassword', 'role_name': 'HoD'},
+        {'username': 33333333, 'password': 'staffpassword', 'role_name': 'Staff'},
+        {'username': 44444444, 'password': 'adminpassword', 'role_name': 'Admin'},
     ]
 
     for user_data in users_data:
         role = Role.query.filter_by(role_name=user_data['role_name']).first()
         if role:
-            user = User(staff_number=user_data['staff_number'], role_id=role.role_id)
+            user = User(username=user_data['username'], role_id=role.role_id)
             user.set_password(user_data['password'])
             db.session.add(user)
 
@@ -35,7 +35,7 @@ def seed_work():
         db.session.add(work_example)
 
 def seed_workload_allocation():
-    workload = WorkloadAllocation(work_id=1, hours_allocated=4.0, staff_number=33333333, approval_status="Pending")
+    workload = WorkloadAllocation(work_id=1, hours_allocated=4.0, username=33333333, approval_status="Pending")
     db.session.add(workload)
 
 def run_seed():

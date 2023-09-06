@@ -13,15 +13,18 @@ class Department(db.Model):
     __table_args__ = (db.CheckConstraint(dept_name.in_(['Physics', 'M&S', 'CSSE'])), )
 
 class User(UserMixin, db.Model):
-    staff_number = db.Column(db.Integer, primary_key=True, nullable=False)
+    username = db.Column(db.Integer, primary_key=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'))
     leave_hours = db.Column(db.Float)
     contract_hour = db.Column(db.Float)
     available_hours = db.Column(db.Float)
 
+    def get_id(self):
+        return (self.username)
+
     def __repr__(self):
-        return '<User {}>'.format(self.staff_number)
+        return '<User {}>'.format(self.username)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -41,10 +44,10 @@ class WorkloadAllocation(db.Model):
     alloc_id = db.Column(db.Integer, primary_key=True)
     work_id = db.Column(db.Integer, db.ForeignKey('work.work_id'))
     hours_allocated = db.Column(db.Float)
-    staff_number = db.Column(db.Integer, db.ForeignKey('user.staff_number'))
+    username = db.Column(db.Integer, db.ForeignKey('user.username'))
     approval_status = db.Column(db.String(64))
     __table_args__ = (db.CheckConstraint(approval_status.in_(['Approved', 'Pending'])), )
 
 @login.user_loader
-def load_user(staff_number):
-    return User.query.get(int(staff_number))
+def load_user(username):
+    return User.query.get(int(username))
