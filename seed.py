@@ -1,5 +1,5 @@
 from app import app, db
-from app.models import Role, Department, User, Work, WorkloadAllocation
+from app.models import Role, Department, User, Work, WorkloadAllocation, Login
 
 def seed_roles():
     roles = ['HoS', 'HoD', 'Staff', 'Admin']
@@ -13,20 +13,30 @@ def seed_departments():
         new_dept = Department(dept_name=dept)
         db.session.add(new_dept)
 
-def seed_users_with_roles():
-    users_data = [
-        {'username': 11111111, 'password': 'hospassword', 'role_name': 'HoS'},
-        {'username': 22222222, 'password': 'hodpassword', 'role_name': 'HoD'},
-        {'username': 33333333, 'password': 'staffpassword', 'role_name': 'Staff'},
-        {'username': 44444444, 'password': 'adminpassword', 'role_name': 'Admin'},
+def seed_login():
+    logins = [
+        {'username': 11111111, 'password': 'hospassword'},
+        {'username': 22222222, 'password': 'hodpassword'},
+        {'username': 33333333, 'password': 'staffpassword'},
+        {'username': 44444444, 'password': 'adminpassword'},
     ]
 
-    for user_data in users_data:
-        role = Role.query.filter_by(role_name=user_data['role_name']).first()
-        if role:
-            user = User(username=user_data['username'], role_id=role.role_id)
-            user.set_password(user_data['password'])
-            db.session.add(user)
+    for login in logins:
+        new_login = Login(username=login['username'])
+        new_login.set_password(login['password'])
+        db.session.add(new_login)
+
+def seed_users():
+    users = [
+        {'username': 11111111, 'role_id': 1, 'leave_hours': 0.0, 'contract_hour': 40.0, 'available_hours': 40.0},
+        {'username': 22222222, 'role_id': 2, 'leave_hours': 0.0, 'contract_hour': 40.0, 'available_hours': 40.0},
+        {'username': 33333333, 'role_id': 3, 'leave_hours': 0.0, 'contract_hour': 40.0, 'available_hours': 40.0},
+        {'username': 44444444, 'role_id': 4, 'leave_hours': 0.0, 'contract_hour': 40.0, 'available_hours': 40.0},
+    ]
+
+    for user in users:
+        new_user = User(username=user['username'], role_id=user['role_id'], leave_hours=user['leave_hours'], contract_hour=user['contract_hour'], available_hours=user['available_hours'])
+        db.session.add(new_user)
 
 def seed_work():
     work_types = ['ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV']
@@ -42,7 +52,8 @@ def run_seed():
     with app.app_context():
         seed_roles()
         seed_departments()
-        seed_users_with_roles()
+        seed_login()
+        seed_users()
         seed_work()
         seed_workload_allocation()
         db.session.commit()

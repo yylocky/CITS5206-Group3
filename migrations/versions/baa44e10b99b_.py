@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 25e19b2d806c
+Revision ID: baa44e10b99b
 Revises: 
-Create Date: 2023-09-06 20:23:17.429539
+Create Date: 2023-09-07 11:12:54.686707
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '25e19b2d806c'
+revision = 'baa44e10b99b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,6 +25,11 @@ def upgrade():
     sa.PrimaryKeyConstraint('dept_id'),
     sa.UniqueConstraint('dept_name')
     )
+    op.create_table('login',
+    sa.Column('username', sa.Integer(), nullable=False),
+    sa.Column('password_hash', sa.String(length=128), nullable=False),
+    sa.PrimaryKeyConstraint('username')
+    )
     op.create_table('role',
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.Column('role_name', sa.String(length=64), nullable=False),
@@ -34,12 +39,13 @@ def upgrade():
     )
     op.create_table('user',
     sa.Column('username', sa.Integer(), nullable=False),
-    sa.Column('password_hash', sa.String(length=128), nullable=False),
     sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('leave_hours', sa.Float(), nullable=True),
     sa.Column('contract_hour', sa.Float(), nullable=True),
     sa.Column('available_hours', sa.Float(), nullable=True),
+    sa.CheckConstraint('available_hours = contract_hour - leave_hours'),
     sa.ForeignKeyConstraint(['role_id'], ['role.role_id'], ),
+    sa.ForeignKeyConstraint(['username'], ['login.username'], ),
     sa.PrimaryKeyConstraint('username')
     )
     op.create_table('work',
@@ -72,5 +78,6 @@ def downgrade():
     op.drop_table('work')
     op.drop_table('user')
     op.drop_table('role')
+    op.drop_table('login')
     op.drop_table('department')
     # ### end Alembic commands ###

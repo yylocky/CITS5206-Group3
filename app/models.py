@@ -12,13 +12,17 @@ class Department(db.Model):
     dept_name = db.Column(db.String(64), nullable=False, unique=True)
     __table_args__ = (db.CheckConstraint(dept_name.in_(['Physics', 'M&S', 'CSSE'])), )
 
-class User(UserMixin, db.Model):
-    username = db.Column(db.Integer, primary_key=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+class User(db.Model):
+    username = db.Column(db.Integer, db.ForeignKey('login.username'), primary_key=True, nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'))
     leave_hours = db.Column(db.Float)
     contract_hour = db.Column(db.Float)
     available_hours = db.Column(db.Float)
+    __table_args__ = (db.CheckConstraint('available_hours = contract_hour - leave_hours'), )
+    
+class Login(UserMixin, db.Model):
+    username = db.Column(db.Integer, primary_key=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
 
     def get_id(self):
         return (self.username)
@@ -50,4 +54,4 @@ class WorkloadAllocation(db.Model):
 
 @login.user_loader
 def load_user(username):
-    return User.query.get(int(username))
+    return Login.query.get(int(username))
