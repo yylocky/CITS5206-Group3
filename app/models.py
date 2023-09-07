@@ -13,7 +13,7 @@ class Department(db.Model):
     __table_args__ = (db.CheckConstraint(dept_name.in_(['Physics', 'M&S', 'CSSE'])), )
 
 class User(db.Model):
-    username = db.Column(db.Integer, db.ForeignKey('login.username'), primary_key=True, nullable=False)
+    username = db.Column(db.Integer, db.ForeignKey('login.username'), primary_key=True, nullable=False) # username is the unique staff number
     role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'))
     leave_hours = db.Column(db.Float)
     contract_hour = db.Column(db.Float)
@@ -21,7 +21,7 @@ class User(db.Model):
     __table_args__ = (db.CheckConstraint('available_hours = contract_hour - leave_hours'), )
     
 class Login(UserMixin, db.Model):
-    username = db.Column(db.Integer, primary_key=True, nullable=False)
+    username = db.Column(db.Integer, primary_key=True, nullable=False) # username is the unique staff number
     password_hash = db.Column(db.String(128), nullable=False)
 
     def get_id(self):
@@ -40,7 +40,6 @@ class Work(db.Model):
     work_id = db.Column(db.Integer, primary_key=True)
     work_explanation = db.Column(db.String(128), nullable=False)
     work_type = db.Column(db.String(64), nullable=False)
-    default_hours = db.Column(db.Float)
     dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'))
     __table_args__ = (db.CheckConstraint(work_type.in_(['ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV'])), )
 
@@ -49,8 +48,9 @@ class WorkloadAllocation(db.Model):
     work_id = db.Column(db.Integer, db.ForeignKey('work.work_id'))
     hours_allocated = db.Column(db.Float)
     username = db.Column(db.Integer, db.ForeignKey('user.username'))
-    approval_status = db.Column(db.String(64))
-    __table_args__ = (db.CheckConstraint(approval_status.in_(['Approved', 'Pending'])), )
+    comment = db.Column(db.String(256))
+    comment_status = db.Column(db.String(64))
+    __table_args__ = (db.CheckConstraint(comment_status.in_(['Read', 'Unread'])), )
 
 @login.user_loader
 def load_user(username):

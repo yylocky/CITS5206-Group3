@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: baa44e10b99b
+Revision ID: a41274e266d9
 Revises: 
-Create Date: 2023-09-07 11:12:54.686707
+Create Date: 2023-09-07 22:20:28.852500
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'baa44e10b99b'
+revision = 'a41274e266d9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,7 +52,6 @@ def upgrade():
     sa.Column('work_id', sa.Integer(), nullable=False),
     sa.Column('work_explanation', sa.String(length=128), nullable=False),
     sa.Column('work_type', sa.String(length=64), nullable=False),
-    sa.Column('default_hours', sa.Float(), nullable=True),
     sa.Column('dept_id', sa.Integer(), nullable=True),
     sa.CheckConstraint("work_type IN ('ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV')"),
     sa.ForeignKeyConstraint(['dept_id'], ['department.dept_id'], ),
@@ -63,8 +62,9 @@ def upgrade():
     sa.Column('work_id', sa.Integer(), nullable=True),
     sa.Column('hours_allocated', sa.Float(), nullable=True),
     sa.Column('username', sa.Integer(), nullable=True),
-    sa.Column('approval_status', sa.String(length=64), nullable=True),
-    sa.CheckConstraint("approval_status IN ('Approved', 'Pending')"),
+    sa.Column('comment', sa.String(length=256), nullable=True),
+    sa.Column('comment_status', sa.String(length=64), nullable=True),
+    sa.CheckConstraint("comment_status IN ('Read', 'Unread')"),
     sa.ForeignKeyConstraint(['username'], ['user.username'], ),
     sa.ForeignKeyConstraint(['work_id'], ['work.work_id'], ),
     sa.PrimaryKeyConstraint('alloc_id')

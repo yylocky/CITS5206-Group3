@@ -41,11 +41,11 @@ def seed_users():
 def seed_work():
     work_types = ['ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV']
     for work_type in work_types:
-        work_example = Work(work_explanation=f"Some explanation for {work_type}", work_type=work_type, default_hours=5.0, dept_id=1)  # Assuming `dept_id=1` for simplicity.
+        work_example = Work(work_explanation=f"Some explanation for {work_type}", work_type=work_type, dept_id=1)  # Assuming `dept_id=1` for simplicity.
         db.session.add(work_example)
 
 def seed_workload_allocation():
-    workload = WorkloadAllocation(work_id=1, hours_allocated=4.0, username=33333333, approval_status="Pending")
+    workload = WorkloadAllocation(work_id=1, hours_allocated=4.0, username=33333333, comment="Some comment", comment_status="Unread")
     db.session.add(workload)
 
 def run_seed():
