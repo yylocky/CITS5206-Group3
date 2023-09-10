@@ -1,16 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import User
+from app.models import Login
 from app.forms import LoginForm, SignupForm
-from datetime import datetime
 from werkzeug.urls import url_parse
 import re
-import pytz
 import random
-
-timezone = pytz.timezone("Australia/Perth")
-now = datetime.now(timezone)
 
 # decorator for login page
 
@@ -22,7 +17,7 @@ def login():
         return redirect(url_for('dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = Login.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid Username or Password')
             return redirect(url_for('login'))
