@@ -93,6 +93,14 @@ body {
       padding: 6px 12px;
     }
   }
+
+nav ul li{
+  margin-top: 3px;
+}
+
+nav ul li:first-child{
+  margin-top: 0;
+}
   
   /* Additional styles can be added as needed */
   

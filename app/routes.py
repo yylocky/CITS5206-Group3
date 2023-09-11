@@ -1,11 +1,12 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login
+from app.models import Login, User, Role
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
 import re
 import random
+from flask import session
 
 # decorator for login page
 
@@ -25,6 +26,7 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('login')
+        set_session(user)
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -38,7 +40,7 @@ def logout():
 @app.route('/view_workload')
 @login_required
 def view_workload():
-    # users=User.query.all() # Just using user table for mockup 
+    # users=User.query.all() # Just using user table for mockup
     return render_template('view_workload.html', title='View Workload')#, users=users)
 
 
@@ -50,7 +52,24 @@ def assign():
 @app.route('/edit_allocation_detail')
 @login_required
 def edit_allocation_detail():
-    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
+    role_name = get_session()
+    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name)
+
+
+def set_session(user):
+    user_info = User.query.filter_by(username=user.username).first()
+    if user_info is None:
+        flash('Invalid Username or Password')
+        return redirect(url_for('login'))
+    role = Role.query.filter_by(role_id=user_info.role_id).first()
+    session['role_id'] = role.role_id
+    session['role_name'] = role.role_name
+
+
+def get_session():
+    role_name = session.get('role_name', '')
+    return role_name
+
 
 @app.route('/dashboard')
 @login_required

@@ -19,6 +19,9 @@ header {
   height: auto;
   margin-right: 10px;
 }
+nav{
+  height: 86.73px;
+}
 
 nav ul {
   list-style-type: none;
@@ -56,6 +59,28 @@ footer {
 
 #footer-text {
   font-size: 14px;
+}
+
+nav ul{
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+
+}
+
+footer p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
 }
 
 /* Additional styles can be added as needed */
