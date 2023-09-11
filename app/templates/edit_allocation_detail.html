@@ -74,7 +74,7 @@ endblock %} {% block styles %}
     </tbody>
   </table>
 </div>
-
+{% if role_name == 'HoS' or role_name == 'HoD' or role_name == 'Admin' %}
 <div class="container">
   <button class="btn btn-primary me-2">Modify</button>
   <!-- <button
@@ -84,7 +84,7 @@ endblock %} {% block styles %}
     Add Modification
   </button> -->
 </div>
-
+{% endif %}
 <div class="container">
   <div class="mb-6">
     <!-- <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label> -->
