@@ -52,9 +52,31 @@ def view_workload():
 def assign():
     return render_template('assign_workload.html', title='Assign Workload')
 
+#get lists of user_ids and deptZ_ids from database
+
+USERIDS = []
+
+DEPTS = []
+
 @app.route('/edit_allocation_detail')
 @login_required
 def edit_allocation_detail():
+
+    # validate submission
+    alloc_id = request.form.get("alloc_id")
+    dept_id = request.form.get("dept_id")
+    task_type = request.form.get("task_type")
+    task_name = request.form.het("task_name")
+    user_id = request.form.get("user_id")
+    assgn_hour = request.form.get("assgn_hour")
+
+    if user_id not in USERIDS or dept_id not in DEPTS or task_type not in TASK_TYPES:
+            return render_template ("assgn_fail.html") # need to add a failure page
+
+    #insert assignment info
+    db.execute("INSERT INFO WorkloadAllocations (alloc_id, dept_id, task_type, task_name, user_id, assgn_hour) VALUES (?, ?, ?, ?, ?, ?)", alloc_id, dept_id, task_type, task_name, user_id, assgn_hour )
+
+
     return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
 
 @app.route('/dashboard')
