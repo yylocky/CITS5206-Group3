@@ -52,15 +52,33 @@ def view_workload():
 def assign():
     return render_template('assign_workload.html', title='Assign Workload')
 
-#get lists of user_ids and deptZ_ids from database
 
-USERIDS = []
-
-DEPTS = []
 
 @app.route('/edit_allocation_detail')
 @login_required
 def edit_allocation_detail():
+
+    # Connect to the database
+    conn = sqlite3.connect('app.db')
+    cursor = conn.cursor()
+
+    # Query to fetch data from the database
+    cursor.execute("SELECT dept_id FROM Departmentss")
+    DEPTS = [row[0] for row in cursor.fetchall()]
+
+    cursor.execute("SELECT work_type FROM WorkloadAllocations")
+    TASK_TYPES = [row[0] for row in cursor.fetchall()]
+
+    cursor.execute("SELECT work_type FROM WorkloadAllocations")
+    TASK_TYPES = [row[0] for row in cursor.fetchall()]
+
+    cursor.execute("SELECT user_id FROM Users")
+    USERIDS = [row[0] for row in cursor.fetchall()]
+
+    # Close the database connection
+    conn.close()   
+
+
 
     # validate submission
     alloc_id = request.form.get("alloc_id")
