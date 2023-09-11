@@ -92,7 +92,7 @@ def edit_allocation_detail():
             return render_template ("assgn_fail.html") # need to add a failure page
 
     #insert assignment info
-    db.execute("INSERT INFO WorkloadAllocations (alloc_id, dept_id, task_type, task_name, user_id, assgn_hour) VALUES (?, ?, ?, ?, ?, ?)", alloc_id, dept_id, task_type, task_name, user_id, assgn_hour )
+    db.execute("INSERT INFO WorkloadAllocations (alloc_id, dept_id, task_type, task_name, user_id, hours_allocated) VALUES (?, ?, ?, ?, ?, ?)", alloc_id, dept_id, task_type, task_name, user_id, assgn_hour )
 
 
     return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
