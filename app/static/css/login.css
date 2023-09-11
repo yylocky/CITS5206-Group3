@@ -1,3 +1,4 @@
+/* login.css */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -8,9 +9,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 40px); /* Adjust the height of footer */
-  padding: 20px 0; /* Add some vertical padding */
-  position: relative; /* Make it relative to position the background */
+  height: calc(100vh - 40px); /* Adjust the height of the container */
+  padding: 20px 0; /* Add vertical padding */
+  position: relative; /* Make the container a reference point for positioning the background video and form */
   z-index: 1; /* Ensure it is on top of the background video */
 }
 
@@ -62,7 +63,6 @@ body {
 
 .form-content h2 {
   margin-top: 22;
-  margin-bottom: 2px;
   font-size: 28px;
 }
 
@@ -101,7 +101,7 @@ body {
 
 #login-form {
   display: flex;
-  flex-wrap: wrap; /* Allow the content to wrap if necessary */
+  flex-wrap: wrap; /* Allow the contents to wrap if necessary */
 }
 
 .background-video {
@@ -112,4 +112,20 @@ body {
   height: 100vh;
   z-index: 0; /* Ensure the video is below other content */
   object-fit: cover; /* Ensure the video covers the full viewport */
+}
+
+.password-wrapper {
+  position: relative;
+  width: 73%;
+}
+
+.visibility-toggle {
+  background: none;
+  border: none;
+  position: absolute;
+  top: 45%;
+  right: 5px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  cursor: pointer;
 }
