@@ -1,11 +1,22 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login
+from app.models import User
 from app.forms import LoginForm, SignupForm
+from datetime import datetime
 from werkzeug.urls import url_parse
 import re
+import pytz
 import random
+import pandas as pd
+import sqlite3
+from app.models import TaskData1
+
+timezone = pytz.timezone("Australia/Perth")
+now = datetime.now(timezone)
+
+def connect_db():
+    return sqlite3.connect("app.db")
 
 # decorator for login page
 
@@ -17,7 +28,7 @@ def login():
         return redirect(url_for('dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = Login.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid Username or Password')
             return redirect(url_for('login'))
@@ -47,6 +58,29 @@ def view_workload():
 def assign():
     return render_template('assign_workload.html', title='Assign Workload')
 
+@app.route("/assign", methods=["POST"])
+def assign_task():
+    try:
+        department1 = request.form.get("department")
+        task_type1 = request.form.get("taskType")
+        task_name1 = request.form.get("taskName")
+        staff_name1 = request.form.get("staffName")
+        assigned_hours1 = request.form.get("assignedHours")
+
+        task_data = TaskData1(
+            department=department1,
+            task_type=task_type1,
+            assigned_hours=float(assigned_hours1), 
+            task_name=task_name1, 
+            staff_name=staff_name1  
+        )
+
+        db.session.add(task_data)
+        db.session.commit()
+
+        return "Task assigned and data stored successfully."
+    except Exception as e:
+        return f"Error: {str(e)}"
 @app.route('/edit_allocation_detail')
 @login_required
 def edit_allocation_detail():

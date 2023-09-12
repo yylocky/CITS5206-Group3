@@ -12,60 +12,58 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
   <!-- Workload Assignment Section -->
   <h3>Workload Assignment [HoS only]</h3>
   <div class="assignmentContainer">
+  <form method="POST" action="/assign">
     <div class="row mt-2 assignmentRow">
       <div class="col-2">
         <label class="form-label">Assignment No.</label>
         Assignment 1
       </div>
-      <div class="col">
-        <label for="department" class="form-label">Department</label>
-        <select class="form-select" id="department">
-          {% for dept in ["CSSE", "M&S", "Physics"] %}
-          <option value="{{ dept }}">{{ dept }}</option>
-          {% endfor %}
-          <!-- 
-          For MySQL data fetching:
-          {% for dept in departments_from_database %}
-          <option value="{{ dept.id }}">{{ dept.name }}</option>
-          {% endfor %}
-          -->
-        </select>
-      </div>
-      <div class="col-2">
-        <label for="taskType" class="form-label">Task Type</label>
-        <select class="form-select" id="taskType">
-          {% for task in ["Uni Coordination", "Project Supervision",
-          "Administration"] %}
-          <option value="{{ task }}">{{ task }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-2">
-        <label for="taskName" class="form-label">Task Name</label>
-        <input type="text" class="form-control" id="taskName" required />
-        <small class="form-text text-danger" style="display: none"
-          >Invalid input</small
-        >
-      </div>
-      <div class="col">
-        <label for="staffName" class="form-label">Staff Name</label>
-        <select class="form-select" id="staffName">
-          <option value="Mary">Mary</option>
-          <option value="Tom">Tom</option>
-          <option value="John">John</option>
-        </select>
-      </div>
-      <div class="col-2">
-        <label for="assignedHours" class="form-label">Assigned Hours</label>
-        <input type="text" class="form-control" id="assignedHours" />
-        <small class="form-text text-danger" style="display: none"
-          >Invalid input</small
-        >
-      </div>
-      <div class="col d-flex align-items-end">
-        <button class="btn btn-primary me-2">Assign</button>
-      </div>
+	<div class="col">
+		<label for="department" class="form-label">Department</label>
+		<select class="form-select" id="department" name="department">
+			{% for dept in ["CSSE", "M&S", "Physics"] %}
+			<option value="{{ dept }}">{{ dept }}</option>
+			{% endfor %}
+		</select>
+	</div>
+
+	<div class="col-2">
+		<label for="taskType" class="form-label">Task Type</label>
+		<select class="form-select" id="taskType" name="taskType">
+			{% for task in ["Uni Coordination", "Project Supervision", "Administration"] %}
+			<option value="{{ task }}">{{ task }}</option>
+			{% endfor %}
+		</select>
+	</div>
+
+	<div class="col-2">
+		<label for="taskName" class="form-label">Task Name</label>
+		<input type="text" class="form-control" id="taskName" name="taskName" required />
+		<small class="form-text text-danger" style="display: none">Invalid input</small>
+	</div>
+
+	<div class="col">
+		<label for="staffName" class="form-label">Staff Name</label>
+		<select class="form-select" id="staffName" name="staffName">
+			<option value="Mary">Mary</option>
+			<option value="Tom">Tom</option>
+			<option value="John">John</option>
+		</select>
+	</div>
+
+	<div class="col-2">
+		<label for="assignedHours" class="form-label">Assigned Hours</label>
+		<input type="text" class="form-control" id="assignedHours" name="assignedHours" />
+		<small class="form-text text-danger" style="display: none">Invalid input</small>
+	</div>
+
+	<div class="col d-flex align-items-end">
+		<button type="submit" class="btn btn-primary me-2">Assign</button>
+	</div>
+
+
     </div>
+  </form>
     <button
       class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
       onclick="addAssignmentRow()"
