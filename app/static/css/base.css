@@ -63,8 +63,8 @@ nav ul li:last-child a {
 }
 
 nav ul li:last-child a:hover {
-  background-color: #e6e6e6;
-  color: rgb(40, 52, 139);
+  background-color: rgb(40, 100, 400);
+  color: white;
 }
 
 /* Effects for active page */
