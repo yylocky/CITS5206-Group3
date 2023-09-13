@@ -15,6 +15,7 @@
   <body>
     <header>
       <!-- Navigation bar -->
+      <!-- Assign conditional active class to each nav link for adding active page effects in base.css -->
       <nav>
         <ul>
           <li>
@@ -22,10 +23,34 @@
               ><img src="../static/images/logo.png" alt="Logo" class="logo"
             /></a>
           </li>
-          <li><a href="/dashboard">My Dashboard</a></li>
-          <li><a href="/view_workload">View Workload</a></li>
-          <li><a href="/assign_workload">Assign Workload</a></li>
-          <li><a href="/edit_allocation_detail">Edit Allocation Detail</a></li>
+          <li>
+            <a
+              href="/dashboard"
+              class="{{ 'active' if request.endpoint == 'dashboard' }}"
+              >My Dashboard</a
+            >
+          </li>
+          <li>
+            <a
+              href="/view_workload"
+              class="{{ 'active' if request.endpoint == 'view_workload' }}"
+              >View Workload</a
+            >
+          </li>
+          <li>
+            <a
+              href="/assign_workload"
+              class="{{ 'active' if request.endpoint == 'assign' }}"
+              >Assign Workload</a
+            >
+          </li>
+          <li>
+            <a
+              href="/edit_allocation_detail"
+              class="{{ 'active' if request.endpoint == 'edit_allocation_detail' }}"
+              >Edit Workload</a
+            >
+          </li>
           {% if current_user.is_anonymous %}
           <li><a href="{{ url_for('login') }}">Login</a></li>
           {% else %}
@@ -47,7 +72,7 @@
     {% endblock %}
     <footer>
       <p id="footer-text">
-        This is a CITS5206 project by 2023 Semester 2 - Group 3 @UWA
+        IT Capstone Project by Group 3 of CITS5206@UWA, 2023 Semester 2
       </p>
     </footer>
     <!-- Bootstrap's JavaScript library -->
