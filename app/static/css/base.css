@@ -6,13 +6,14 @@ body {
 }
 
 header {
-  background-color: rgb(40,52,139);
-  padding: 10px;
+  height: 100px;
+  background-color: rgb(40, 52, 139);
+  padding: 0 10px;
   display: flex;
   align-items: center;
+  justify-content: space-between; /* distribute the space between logo and nav links */
 }
 
-/* Style for the logo image */
 .logo {
   width: 100%;
   max-width: 150px;
@@ -26,16 +27,53 @@ nav{
 nav ul {
   list-style-type: none;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Center align nav links */
+  flex: 1; /* Allow nav links to occupy the remaining width */
 }
 
 nav ul li {
   margin: 0 20px;
+  align-items: center; /* Align UWA logo with other elements in the nav bar */
+  display: flex;
 }
 
 nav ul li a {
+  font-size: 19px;
   text-decoration: none;
   color: white;
+  padding: 10px 10px; /* Add padding for hover effect */
+  border-radius: 5px; /* Rounded corners for hover effect */
+  transition: background-color 0.2s; /* Smooth transition for hover effect */
+}
+
+nav ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Light hover effect */
+  color: white;
+  transition: background-color 0.3s;
+}
+
+/* last-child = login/logout button */
+nav ul li:last-child {
+  width: 200px;
+  justify-content: flex-end;
+}
+
+nav ul li:last-child a {
+  background-color: white;
+  color: rgb(40, 52, 139);
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+nav ul li:last-child a:hover {
+  background-color: rgb(40, 100, 400);
+  color: white;
+}
+
+/* Effects for active page */
+nav ul li a.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 3px solid white;
 }
 
 .flashes {
@@ -48,12 +86,14 @@ nav ul li a {
   background-color: #ffc107;
   padding: 10px;
   border-radius: 5px;
+  position: relative;
+  z-index: 2; /* Ensure the flash messages are on the top the background video */
 }
 
 footer {
   text-align: center;
-  margin-top: 20px;
-  padding: 10px;
+  margin-top: 0px;
+  padding: 5px;
   background-color: #f7f7f7;
 }
 
@@ -84,3 +124,4 @@ footer p {
 }
 
 /* Additional styles can be added as needed */
+

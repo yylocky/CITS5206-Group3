@@ -1,47 +1,97 @@
-/* base.css */
+/* login.css */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
-/* login.css */
 .login-box-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: calc(100vh - 40px); /* Adjust the height of the container */
+  padding: 20px 0; /* Add vertical padding */
+  position: relative; /* Make the container a reference point for positioning the background video and form */
+  z-index: 1; /* Ensure it is on top of the background video */
 }
 
 .login-box {
-  border: 1px solid #ccc;
-  padding: 20px;
-  border-radius: 5px;
-  background-color: #fff;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.5); /* Make it slightly transparent */
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
+  max-width: 700px;
   width: 100%;
+  display: flex; /* Make the login-box a flex container */
+  justify-content: space-between; /* Space out the two children (form-details and form-content) */
+}
+
+.form-details,
+.form-content {
+  flex: 1; /* Make both children take equal width */
+  padding: 0 10px; /* Add some padding for spacing */
+}
+
+.form-details {
+  display: flex; /* Make the form-details a flex container */
+  flex-direction: column; /* Stack the children vertically */
+  justify-content: center; /* Center the children vertically */
+  background-color: rgba(200, 230, 241, 0.5);
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.form-details h2 {
+  margin-top: 0px;
+  margin-bottom: 30px;
+  margin-left: 13px;
+  font-size: 28px;
+}
+
+.form-details p {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  margin-left: 13px;
+  font-size: 18px;
+}
+
+.form-content {
+  display: flex; /* Make the form-content a flex container */
+  flex-direction: column; /* Stack the children vertically */
+  justify-content: center; /* Center the children vertically */
+  align-items: center; /* Center the children horizontally */
+}
+
+.form-content h2 {
+  margin-top: 22;
+  font-size: 28px;
+}
+
+.form-content p {
+  margin-bottom: 1px;
+  margin-top: 10px;
 }
 
 .login-input {
-  width: 100%;
+  width: 94%;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 .login-btn {
-  background-color: rgb(40,52,139);
+  background-color: rgb(40, 52, 139);
   color: #fff;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-bottom: 18px;
+  font-size: 18px;
 }
 
 .login-btn:hover {
-  background-color: rgb(40,52,139);
+  background-color: rgb(40, 100, 400);
 }
 
 .login-form p span {
@@ -58,3 +108,33 @@ nav ul li:first-child{
 }
 
 /* Additional styles can be added as needed */
+#login-form {
+  display: flex;
+  flex-wrap: wrap; /* Allow the contents to wrap if necessary */
+}
+
+.background-video {
+  position: absolute;
+  top: 100px;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 0; /* Ensure the video is below other content */
+  object-fit: cover; /* Ensure the video covers the full viewport */
+}
+
+.password-wrapper {
+  position: relative;
+  width: 73%;
+}
+
+.visibility-toggle {
+  background: none;
+  border: none;
+  position: absolute;
+  top: 45%;
+  right: 5px;
+  transform: translateY(-50%);
+  font-size: 20px;
+  cursor: pointer;
+}
