@@ -1,27 +1,30 @@
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 class Role(db.Model):
     role_id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(64), nullable=False, unique=True)
-    __table_args__ = (db.CheckConstraint(role_name.in_(['HoS', 'HoD', 'Staff', 'Admin'])), )
+    __table_args__ = (db.CheckConstraint(role_name.in_(['HoS', 'HoD', 'Staff', 'Admin']), name='role_name_check'),)
 
 class Department(db.Model):
     dept_id = db.Column(db.Integer, primary_key=True)
     dept_name = db.Column(db.String(64), nullable=False, unique=True)
-    __table_args__ = (db.CheckConstraint(dept_name.in_(['Physics', 'M&S', 'CSSE'])), )
+    __table_args__ = (db.CheckConstraint(dept_name.in_(['Physics', 'M&S', 'CSSE']), name='dept_name_check'),)
 
 class User(db.Model):
-    username = db.Column(db.Integer, db.ForeignKey('login.username'), primary_key=True, nullable=False) # username is the unique staff number
+    username = db.Column(db.Integer, db.ForeignKey('login.username'), primary_key=True) # username is the unique staff number
     role_id = db.Column(db.Integer, db.ForeignKey('role.role_id'))
     leave_hours = db.Column(db.Float)
     contract_hour = db.Column(db.Float)
     available_hours = db.Column(db.Float)
-    __table_args__ = (db.CheckConstraint('available_hours = contract_hour - leave_hours'), )
+    dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'))
+    __table_args__ = (db.CheckConstraint('available_hours = contract_hour - leave_hours', name='available_hours_check'),)
     
 class Login(UserMixin, db.Model):
-    username = db.Column(db.Integer, primary_key=True, nullable=False) # username is the unique staff number
+    username = db.Column(db.Integer, primary_key=True) # username is the unique staff number
     password_hash = db.Column(db.String(128), nullable=False)
 
     def get_id(self):
@@ -38,19 +41,39 @@ class Login(UserMixin, db.Model):
 
 class Work(db.Model):
     work_id = db.Column(db.Integer, primary_key=True)
-    work_explanation = db.Column(db.String(128), nullable=False)
+    work_explanation = db.Column(db.String(128))
+    unit_code = db.Column(db.String(64)) # unit_code is optional only if the work is related to a unit
     work_type = db.Column(db.String(64), nullable=False)
-    dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'))
-    __table_args__ = (db.CheckConstraint(work_type.in_(['ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV'])), )
+    dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'), nullable=False)
+    __table_args__ = (db.CheckConstraint(work_type.in_(['ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV','LSL', 'PL', 'SBL']), name='work_type_check'),)
+
+    @hybrid_property
+    def work_category(self):
+        if self.work_type in ["ADMIN", "GA", "SDS"]:
+            return "Service"
+        elif self.work_type in ["CWS", "TEACH", "UDEV"]:
+            return "Teaching"
+        elif self.work_type in ["HDR", "ORES", "RES-MGMT", "RESERV"]:
+            return "Research"
+        elif self.work_type in ["LSL", "PL", "SBL"]:
+            return "Leave"
+        else:
+            return None
+        
 
 class WorkloadAllocation(db.Model):
     alloc_id = db.Column(db.Integer, primary_key=True)
-    work_id = db.Column(db.Integer, db.ForeignKey('work.work_id'))
-    hours_allocated = db.Column(db.Float)
-    username = db.Column(db.Integer, db.ForeignKey('user.username'))
+    work_id = db.Column(db.Integer, db.ForeignKey('work.work_id'), nullable=False)
+    hours_allocated = db.Column(db.Float, nullable=False)
+    workload_point = db.Column(db.Float, nullable=False)
+    username = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     comment = db.Column(db.String(256))
     comment_status = db.Column(db.String(64))
-    __table_args__ = (db.CheckConstraint(comment_status.in_(['Read', 'Unread'])), )
+    user = db.relationship('User', backref='work')
+    __table_args__ = (
+        db.CheckConstraint(comment_status.in_(['Read', 'Unread']), name='comment_status_check'), 
+        db.CheckConstraint('workload_point == hours_allocated / user.contract_hour', name='workload_point_check'),
+    )
 
 @login.user_loader
 def load_user(username):
