@@ -22,6 +22,7 @@ class User(db.Model):
     available_hours = db.Column(db.Float)
     dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'))
     __table_args__ = (db.CheckConstraint('available_hours = contract_hour - leave_hours', name='available_hours_check'),)
+    department = db.relationship('Department', backref='users') 
     
 class Login(UserMixin, db.Model):
     username = db.Column(db.Integer, primary_key=True) # username is the unique staff number
@@ -46,6 +47,8 @@ class Work(db.Model):
     work_type = db.Column(db.String(64), nullable=False)
     dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'), nullable=False)
     __table_args__ = (db.CheckConstraint(work_type.in_(['ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV','LSL', 'PL', 'SBL']), name='work_type_check'),)
+    department = db.relationship('Department', backref='works')
+
 
     @hybrid_property
     def work_category(self):
@@ -69,7 +72,9 @@ class WorkloadAllocation(db.Model):
     username = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
     comment = db.Column(db.String(256))
     comment_status = db.Column(db.String(64))
-    user = db.relationship('User', backref='work')
+    user = db.relationship('User', backref='workload_allocations')
+    work = db.relationship('Work', backref='workload_allocations')
+
     __table_args__ = (
         db.CheckConstraint(comment_status.in_(['Read', 'Unread']), name='comment_status_check'), 
         db.CheckConstraint('workload_point == hours_allocated / user.contract_hour', name='workload_point_check'),
