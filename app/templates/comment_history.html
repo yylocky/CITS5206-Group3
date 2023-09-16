@@ -1,0 +1,166 @@
+{% extends "base.html" %} {% block title %} comment_history {% endblock %} {%
+block styles %}
+<!-- Load base styles -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/base.css') }}"
+/>
+<!-- Load Font Awesome icons for Export CSV button -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+/>
+<!-- Load styles specific to the comment history page -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/comment_history.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="content-wrapper">
+  <div class="box-container">
+    <div class="title">
+      <p>Comment History</p>
+    </div>
+    <!-- Check if user is not authenticated and display login link -->
+    {% if not current_user.is_authenticated %}
+    <div class="login-box">
+      <h3>
+        <i class="fas fa-sign-in-alt"></i>
+        <a href="{{ url_for('login') }}">Log In</a>
+      </h3>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Filter and comments listing section -->
+  <div class="comment-list">
+    <div class="filter-title">
+      <p>Filter</p>
+      <!-- Filter by Staff Number -->
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Staff Number"
+      />
+
+      <!-- Filter by Comment -->
+      <input type="text" class="filter-input" placeholder="Filter by Comment" />
+
+      <!-- Filter by Comment Status -->
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Comment Status"
+      />
+
+      <!-- Button to export table data as CSV -->
+      <button class="export-button">
+        <i class="fas fa-file-export"></i>
+        Export CSV
+      </button>
+    </div>
+
+    <!-- Table to display comment data -->
+    <table>
+      <thead>
+        <tr>
+          <th>Staff Number</th>
+          <th>Comment</th>
+          <th>Comment Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Iterate over each comment and display its data -->
+        {% for comment in comments %}
+        <!-- comments variable defined in routes.py -->
+        <tr>
+          <td>{{ comment.username }}</td>
+          <td>{{ comment.comment }}</td>
+          <td>{{ comment.comment_status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  //Script for table filtering functionality
+
+  // Get all filter input elements
+  const filterInputs = document.querySelectorAll(".filter-input");
+
+  // Get all table rows
+  const rows = document.querySelectorAll(".comment-list tbody tr");
+
+  // Add event listeners to each filter input for real-time filtering
+  filterInputs.forEach((input) => {
+    input.addEventListener("input", () => {
+      applyFilter();
+    });
+  });
+
+  // Function to apply filter on table rows based on input values
+  function applyFilter() {
+    rows.forEach((row) => {
+      const columns = row.getElementsByTagName("td");
+      let shouldHideRow = false;
+
+      Array.from(columns).forEach((column, index) => {
+        if (
+          !column.innerText
+            .toLowerCase()
+            .includes(filterInputs[index].value.toLowerCase())
+        ) {
+          shouldHideRow = true;
+        }
+      });
+
+      if (shouldHideRow) {
+        row.style.display = "none";
+      } else {
+        row.style.display = "";
+      }
+    });
+  }
+
+  // Script for exporting (filered) table data as CSV
+
+  const exportButton = document.querySelector(".export-button");
+
+  // Add event listener to the export button
+  exportButton.addEventListener("click", () => {
+    exportToCSV();
+  });
+
+  // Function to export currently displayed table rows as CSV
+  function exportToCSV() {
+    const filteredRows = Array.from(rows).filter(
+      (row) => row.style.display !== "none"
+    );
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      encodeURI(generateCSVContent(filteredRows));
+
+    const link = document.createElement("a");
+    link.href = csvContent;
+    link.download = "comment_history.csv";
+    link.click();
+  }
+
+  // Function to generate CSV content from table rows
+  function generateCSVContent(rows) {
+    const headers = Array.from(
+      document.querySelectorAll(".comment-list th")
+    ).map((header) => header.textContent);
+    const rowsContent = rows.map((row) =>
+      Array.from(row.querySelectorAll("td"))
+        .map((cell) => cell.textContent)
+        .join(",")
+    );
+
+    return [headers.join(","), ...rowsContent].join("\n");
+  }
+</script>
+{% endblock %}

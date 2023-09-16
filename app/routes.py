@@ -66,7 +66,37 @@ def dashboard():
     return render_template('dashboard.html', title='Dashboard')
 
 
+@app.route('/comment_history')
+@login_required
+def comment_history():
+    # Check if the current user is an HoD
+    if g.is_hod:
+        # Fetch the department ID of the current HoD user
+        hod_dept_id = User.query.filter_by(
+            username=current_user.username).first().dept_id
+
+        # Fetch the comments made by staff members with the same dept_id as that of the HoD user and save them in the comments variable
+        comments = WorkloadAllocation.query.join(User, WorkloadAllocation.username == User.username).filter(
+            User.dept_id == hod_dept_id
+        ).all()
+
+        # Update the comment_status from "Unread" to "Read" for each fetched comment (i.e. upon accessing the comment history page, all comments will be marked as "Read")
+        for comment in comments:
+            if comment.comment_status == "Unread":
+                comment.comment_status = "Read"
+                db.session.commit()
+
+        # Render the comment history page
+        return render_template('comment_history.html', title='Comment History', comments=comments)
+
+    # If the current user is not an HoD, redirect them to some other page or display an error message (depends on your application's requirements)
+    else:
+        flash('You do not have permission to view this page.')
+        return redirect(url_for('dashboard'))
+
 # This function runs before processing a request
+
+
 @app.before_request
 def before_request():
     # Initialise the global notification flag to False

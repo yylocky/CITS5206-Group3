@@ -51,6 +51,16 @@
               >Edit Workload</a
             >
           </li>
+          <!-- The nav link for Comment History is only displayed to HoD users -->
+          {% if g.is_hod %}
+          <li>
+            <a
+              href="/comment_history"
+              class="{{ 'active' if request.endpoint == 'comment_history' }}"
+              >Comment History</a
+            >
+          </li>
+          {% endif %}
           <!-- Notification Alert -->
           <!-- The alert will only pop up if the global notification flag g is True. -->
           <!-- g is defined under @app.before_request in routes.py -->
