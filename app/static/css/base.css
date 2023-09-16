@@ -26,6 +26,7 @@ nav ul {
   display: flex;
   justify-content: center; /* Center align nav links */
   flex: 1; /* Allow nav links to occupy the remaining width */
+  align-items: center; /* Vertical alignment of children */
 }
 
 nav ul li {
@@ -51,7 +52,7 @@ nav ul li a:hover {
 
 /* last-child = login/logout button */
 nav ul li:last-child {
-  width: 200px;
+  width: 80px;
   justify-content: flex-end;
 }
 
@@ -96,4 +97,30 @@ footer {
 
 #footer-text {
   font-size: 14px;
+}
+
+.notification-alert {
+  background-color: #ffcc00;
+  padding: 20px 4px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  width: 160px;
+  height: 25px;
+  text-align: center;
+  margin-right: 0px;
+}
+
+.notification-alert .btn-close {
+  width: 35px;
+  height: 28px;
+  background-color: transparent;
+  border: 0;
+  opacity: 10;
+  font-size: 1.8rem; /* Size of the cross */
+}
+
+.notification-alert .btn-close:hover {
+  cursor: pointer;
+  opacity: 0.5;
 }

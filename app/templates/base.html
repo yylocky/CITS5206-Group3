@@ -51,6 +51,21 @@
               >Edit Workload</a
             >
           </li>
+          <!-- Notification Alert -->
+          <li
+            class="alert alert-warning alert-dismissible fade show notification-alert"
+            role="alert"
+          >
+            New message(s) in Comment History!
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            >
+              &times;
+            </button>
+          </li>
           {% if current_user.is_anonymous %}
           <li><a href="{{ url_for('login') }}">Login</a></li>
           {% else %}
