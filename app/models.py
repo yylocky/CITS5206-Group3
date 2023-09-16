@@ -9,6 +9,7 @@ class Role(db.Model):
     role_name = db.Column(db.String(64), nullable=False, unique=True)
     __table_args__ = (db.CheckConstraint(role_name.in_(['HoS', 'HoD', 'Staff', 'Admin']), name='role_name_check'),)
 
+
 class Department(db.Model):
     dept_id = db.Column(db.Integer, primary_key=True)
     dept_name = db.Column(db.String(64), nullable=False, unique=True)
@@ -20,7 +21,7 @@ class User(db.Model):
     leave_hours = db.Column(db.Float)
     contract_hour = db.Column(db.Float)
     available_hours = db.Column(db.Float)
-    dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'))
+    dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'))#staff belongs to a department
     __table_args__ = (db.CheckConstraint('available_hours = contract_hour - leave_hours', name='available_hours_check'),)
     department = db.relationship('Department', backref='users') 
     
@@ -44,10 +45,12 @@ class Work(db.Model):
     work_id = db.Column(db.Integer, primary_key=True)
     work_explanation = db.Column(db.String(128))
     unit_code = db.Column(db.String(64)) # unit_code is optional only if the work is related to a unit
-    work_type = db.Column(db.String(64), nullable=False)
-    dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'), nullable=False)
+    work_type = db.Column(db.String(64), nullable=False)#work type is one of the following 10 types of work and 3 types of leave
+    dept_id = db.Column(db.Integer, db.ForeignKey('department.dept_id'), nullable=False)#work belongs to a department
     __table_args__ = (db.CheckConstraint(work_type.in_(['ADMIN', 'CWS', 'GA', 'HDR', 'ORES', 'RES-MGMT', 'RESERV', 'SDS', 'TEACH', 'UDEV','LSL', 'PL', 'SBL']), name='work_type_check'),)
     department = db.relationship('Department', backref='works')
+    #add index to the table
+    db.Index('idx_work_id', 'work_id')
 
 
     @hybrid_property
@@ -74,11 +77,12 @@ class WorkloadAllocation(db.Model):
     comment_status = db.Column(db.String(64))
     user = db.relationship('User', backref='workload_allocations')
     work = db.relationship('Work', backref='workload_allocations')
-
     __table_args__ = (
         db.CheckConstraint(comment_status.in_(['Read', 'Unread']), name='comment_status_check'), 
         db.CheckConstraint('workload_point == hours_allocated / user.contract_hour', name='workload_point_check'),
     )
+    #add index to the table
+    db.Index('idx_alloc_id', 'alloc_id')
 
 @login.user_loader
 def load_user(username):
