@@ -58,7 +58,6 @@ body {
   background-color: rgb(40, 52, 139);
 }
 
-/* Table styles */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -78,4 +77,13 @@ th {
 /* Icon for Export CSV button */
 .fas {
   margin-right: 5px;
+}
+
+.view-button {
+  background-color: rgb(40, 52, 139);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 14px;
+  cursor: pointer;
 }

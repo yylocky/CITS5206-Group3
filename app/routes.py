@@ -43,9 +43,18 @@ def logout():
 @app.route('/view_workload')
 @login_required
 def view_workload():
-    # users=User.query.all() # Just using user table for mockup
-    # , users=users)
-    return render_template('view_workload.html', title='View Workload')
+    # Check if the alloc_id is present in the request's query parameters
+    alloc_id = request.args.get('alloc_id')
+
+    if alloc_id:
+        # Fetch workload entries with the specified alloc_id
+        workloads = WorkloadAllocation.query.filter_by(
+            alloc_id=alloc_id).all()
+    else:
+        # If no alloc_id is specified (i.e. accessed from nav bar), fetch all workload entries
+        workloads = WorkloadAllocation.query.all()
+
+    return render_template('view_workload.html', title='View Workload', workloads=workloads)
 
 
 @app.route('/assign_workload')
@@ -80,21 +89,43 @@ def comment_history():
             User.dept_id == hod_dept_id
         ).all()
 
-        # Update the comment_status from "Unread" to "Read" for each fetched comment (i.e. upon accessing the comment history page, all comments will be marked as "Read")
-        for comment in comments:
-            if comment.comment_status == "Unread":
-                comment.comment_status = "Read"
-                db.session.commit()
-
         # Render the comment history page
         return render_template('comment_history.html', title='Comment History', comments=comments)
 
     # If the current user is not an HoD, redirect them to some other page or display an error message (depends on your application's requirements)
     else:
-        flash('You do not have permission to view this page.')
+        flash('You do not have permission to view the Comment History page.')
         return redirect(url_for('dashboard'))
 
-# This function runs before processing a request
+
+@app.route('/mark_comments_as_read', methods=['POST'])
+@login_required
+def mark_comments_as_read():
+    # Check if the user is an HoD
+    if g.is_hod:
+        # Fetch the department ID of the current HoD user
+        hod_dept_id = User.query.filter_by(
+            username=current_user.username).first().dept_id
+
+        # Fetch the comments made by staff members with the same dept_id as that of the HoD user
+        comments = WorkloadAllocation.query.join(User, WorkloadAllocation.username == User.username).filter(
+            User.dept_id == hod_dept_id
+        ).all()
+
+        # Update the comment_status to "Read" for each fetched comment
+        for comment in comments:
+            if comment.comment_status == "Unread":
+                comment.comment_status = "Read"
+                db.session.commit()
+
+        # Return success status as JSON response
+        return jsonify(status="success"), 200
+
+    # If the user is not an HoD, return an error message
+    else:
+        return jsonify(status="error", message="Unauthorised access"), 403
+
+# The below function runs before processing a request
 
 
 @app.before_request
