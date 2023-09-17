@@ -8,11 +8,6 @@ block content %}
 rel="stylesheet" 
 href="{{ url_for('static', filename='css/view_workload.css') }}"
 />
-    <style>
-        nav ul li{
-          margin-top: 0px;
-        }
-    </style>
 <div class="container mt-5">
   <!-- Workload Assignment Section -->
   <h3>Workload Assignment [HoS only]</h3>
@@ -79,18 +74,16 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
     </button>
   </div>
 
-  <!-- File Upload Section -->
-  <h3 class="mt-5">File Upload [HoS / HoDs / Admin]</h3>
-  <div class="uploadContainer">
+<!-- File Upload Section -->
+<h3 class="mt-5">File Upload [HoS / HoDs / Admin]</h3>
+<div class="uploadContainer">
+  <form action="/upload" method="POST" enctype="multipart/form-data">
     <div class="row mt-2 uploadRow">
-      <div class="col-2">
-        <label class="form-label">Spreadsheet No.</label>
-        Spreadsheet 1
-      </div>
       <div class="col-4">
         <label for="uploadFile" class="form-label">Upload File</label>
         <input
           type="file"
+          name="file"
           class="form-control"
           id="uploadFile"
           accept=".xlsx, .xls, .csv, .tsv"
@@ -100,33 +93,18 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
         >
       </div>
       <div class="col d-flex align-items-end">
-        <button class="btn btn-primary me-2">Upload</button>
+        <button type="submit" class="btn btn-primary me-2">Upload</button>
       </div>
     </div>
-    <button
-      class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
-      onclick="addUploadRow()"
-    >
-      Add File
-    </button>
-  </div>
-
-  <!-- Approval of Uploaded Assignment Section -->
-  <h3 class="mt-5">[TBC] Approval of Uploaded Assignment [HoS only]</h3>
-  <div class="approvalContainer">
-    {% for spreadsheet in ["Spreadsheet 1", "Spreadsheet 2", "Spreadsheet 3"] %}
-    <div class="row mt-2 approvalRow">
-      <div class="col-2">{{ spreadsheet }}</div>
-      <div class="col-1">
-        <button class="btn btn-primary">Download</button>
-      </div>
-      <div class="col">
-        <button class="btn btn-success">Approve</button>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
+  </form>
+  <button
+    class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
+    onclick="addUploadRow()"
+  >
+    Add File
+  </button>
 </div>
+
 
 <script>
   let asgNumber = 1;
