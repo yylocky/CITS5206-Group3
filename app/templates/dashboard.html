@@ -3,6 +3,11 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+<style>
+    nav ul li:last-child a{
+        padding: 2px 10px;
+    }
+</style>
 <div class="content-container">
   <div class="main-content">
     <div class="top">

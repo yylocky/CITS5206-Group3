@@ -99,9 +99,8 @@ body {
   font-size: 12px;
 }
 
-<<<<<<< HEAD
 nav ul li{
-  margin-top: 3px;
+  margin-top: -4px;
 }
 
 nav ul li:first-child{
@@ -109,7 +108,6 @@ nav ul li:first-child{
 }
 
 /* Additional styles can be added as needed */
-=======
 #login-form {
   display: flex;
   flex-wrap: wrap; /* Allow the contents to wrap if necessary */
@@ -140,4 +138,3 @@ nav ul li:first-child{
   font-size: 20px;
   cursor: pointer;
 }
->>>>>>> 36803eb76fe2fe66515fbcc2f3d4f1e35eeaa423
