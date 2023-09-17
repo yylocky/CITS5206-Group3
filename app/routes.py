@@ -1,22 +1,14 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import User
+from app.models import Login
+from app.models import WorkloadAllocation
+from app.models import User,Department,Role,Work
 from app.forms import LoginForm, SignupForm
-from datetime import datetime
 from werkzeug.urls import url_parse
-import re
-import pytz
-import random
 import pandas as pd
-import sqlite3
-from app.models import TaskData1
-
-timezone = pytz.timezone("Australia/Perth")
-now = datetime.now(timezone)
-
-def connect_db():
-    return sqlite3.connect("app.db")
+import re
+import random
 
 # decorator for login page
 
@@ -28,7 +20,7 @@ def login():
         return redirect(url_for('dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = Login.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid Username or Password')
             return redirect(url_for('login'))
@@ -58,29 +50,6 @@ def view_workload():
 def assign():
     return render_template('assign_workload.html', title='Assign Workload')
 
-@app.route("/assign", methods=["POST"])
-def assign_task():
-    try:
-        department1 = request.form.get("department")
-        task_type1 = request.form.get("taskType")
-        task_name1 = request.form.get("taskName")
-        staff_name1 = request.form.get("staffName")
-        assigned_hours1 = request.form.get("assignedHours")
-
-        task_data = TaskData1(
-            department=department1,
-            task_type=task_type1,
-            assigned_hours=float(assigned_hours1), 
-            task_name=task_name1, 
-            staff_name=staff_name1  
-        )
-
-        db.session.add(task_data)
-        db.session.commit()
-
-        return "Task assigned and data stored successfully."
-    except Exception as e:
-        return f"Error: {str(e)}"
 @app.route('/edit_allocation_detail')
 @login_required
 def edit_allocation_detail():
@@ -90,6 +59,114 @@ def edit_allocation_detail():
 @login_required
 def dashboard():
     return render_template('dashboard.html', title='Dashboard')
+
+
+@app.route("/getpoint", methods=["POST"])
+def get_point():
+    staff_id = request.form.get("staffId")  # 获取 staffId 参数的值
+
+    # 使用 staff_id 进行筛选
+    user = User.query.filter_by(username=staff_id).first()  # 获取匹配的第一个用户
+
+    if user:
+        contract_hour = user.contract_hour
+
+        return jsonify({"contract_hour": contract_hour})
+    else:
+        return jsonify({"message": "User not found"})
+
+
+@app.route('/assign', methods=['POST'])
+def assign_task():
+    try:
+        k_category = request.form.get("category")
+        k_taskType = request.form.get("taskType")
+        k_department = request.form.get("department")
+        k_work_id = request.form.get("staffId")
+        k_username = k_work_id
+        k_comment = request.form.get("explanation")
+        k_comment_status = "Unread"
+        k_unit_code = request.form.get("unitCode")
+        k_hours_allocated = request.form.get("assignedHours")
+        k_workload_point = request.form.get("workPoint")
+
+        print("k_category: ")
+        print(k_category)
+        print("k_taskType: ")
+        print(k_taskType)
+        print("k_department: ")
+        print(k_department)
+        print("k_work_id: ")
+        print(k_work_id)
+        print("k_username: ")
+        print(k_username)
+        print("k_comment: ")
+        print(k_comment)
+        print("k_comment_status: ")
+        print(k_comment_status)
+        print("k_unit_code: ")
+        print(k_unit_code)
+        print("k_hours_allocated: ")
+        print(k_hours_allocated)
+        print("k_workload_point: ")
+        print(k_workload_point)
+
+        k_depart = Department.query.filter_by(dept_name=k_department).first()
+        print(k_depart)
+        k_dept_id = k_depart.dept_id
+        print(k_dept_id)
+
+        role_name = "HoS"
+        k_role = Role.query.filter_by(role_name=role_name).first()
+        k_role_id = k_role.role_id
+        print(k_role_id)
+
+        # #workload
+        k_workload_allocation = WorkloadAllocation(
+            work_id=int(k_work_id),
+            hours_allocated=float(k_hours_allocated),
+            username=k_username,
+            comment=k_comment,
+            comment_status=k_comment_status,
+            workload_point=float(k_workload_point)
+        )
+
+        db.session.add(k_workload_allocation)
+        db.session.commit()
+        #
+
+        # #work
+        k_work_explanation="Some explanation for " + k_taskType
+        k_work = Work(
+            work_id=k_work_id,
+            work_explanation=k_work_explanation,
+            work_type=k_taskType,
+            dept_id=int(k_dept_id),
+            unit_code=k_unit_code
+        )
+        #
+        db.session.add(k_work)
+        db.session.commit()
+
+        #user
+        k_contract_hour = float(k_workload_point) / float(k_hours_allocated)
+
+        k_user=User(
+            username=k_username,
+            role_id=int(k_role_id),
+            leave_hours=float(0),
+            contract_hour=float(k_contract_hour),
+            available_hours=float(k_contract_hour),
+            dept_id=int(k_dept_id)
+        )
+
+        db.session.add(k_user)
+        db.session.commit()
+
+        return "assigned and data stored successfully."
+    except Exception as e:
+        return f"Error: {str(e)}"
+
 
 
 

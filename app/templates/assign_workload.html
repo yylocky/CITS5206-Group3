@@ -10,61 +10,96 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
 />
 <div class="container mt-5">
   <!-- Workload Assignment Section -->
-  <h3>Workload Assignment [HoS only]</h3>
+  <h3>Workload Assignment [HoS / HoDs / Admin]</h3>
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <label for="contractHour">Enter Contract Hour:</label>
+        <input type="text" id="contractHour">
+        <button id="submitContractHour">Submit</button>
+      </div>
+    </div>
+
   <div class="assignmentContainer">
   <form method="POST" action="/assign">
     <div class="row mt-2 assignmentRow">
-      <div class="col-2">
-        <label class="form-label">Assignment No.</label>
-        Assignment 1
-      </div>
-	<div class="col">
-		<label for="department" class="form-label">Department</label>
-		<select class="form-select" id="department" name="department">
-			{% for dept in ["CSSE", "M&S", "Physics"] %}
-			<option value="{{ dept }}">{{ dept }}</option>
-			{% endfor %}
-		</select>
-	</div>
+            <div class="col">
+            <label for="category" class="form-label">Category</label>
+                <select id="category" class="form-select" name="category" onchange="updateTaskType()">
+                    <option value="Service">Service</option>
+                    <option value="Teaching">Teaching</option>
+                    <option value="Research">Research</option>
+                    <option value="Leave">Leave</option>
+                </select>
+            <br>
+            </div>
+          <div class="col">
+            <label for="taskType" class="form-label">Task Type</label>
+            <select class="form-select" id="taskType" name="taskType">
+    {#          {% for task in ["Uni Coordination", "Project Supervision",#}
+    {#          "Administration"] %}#}
+    {#          <option value="{{ task }}">{{ task }}</option>#}
+    {#          {% endfor %}#}
+            </select>
+          </div>
+          <div class="col">
+            <label for="department" class="form-label">Department</label>
+            <select class="form-select" id="department"  name="department">
+              {% for dept in ["CSSE", "M&S", "Physics"] %}
+              <option value="{{ dept }}">{{ dept }}</option>
+              {% endfor %}
+              <!--
+              For MySQL data fetching:
+              {% for dept in departments_from_database %}
+              <option value="{{ dept.id }}">{{ dept.name }}</option>
+              {% endfor %}
+              -->
+            </select>
+          </div>
+        <div class="col">
+            <label for="staffId" class="form-label">Staff Id</label>
+            <input type="text" class="form-control" id="staffId"  name="staffId" onblur="updatePointDisplay()"/>
+            <small class="form-text text-danger" style="display: none"
+              >Invalid input</small
+            >
+            <br>
+        </div>
+          <div class="col">
+            <label for="explanation" class="form-label">Explanation</label>
+            <input type="text" class="form-control" id="explanation" name="explanation" required />
+            <small class="form-text text-danger" style="display: none"
+              >Invalid input</small
+            >
+          </div>
+        <div class="col">
+            <label for="unitCode" class="form-label">Unit Code</label>
+            <input type="text" class="form-control" id="unitCode" name="unitCode" />
+                <small class="form-text text-danger" style="display: none"
+                  >Invalid input</small
+            >
+        </div>
+          <div class="col">
+            <label for="assignedHours" class="form-label">Assigned Hours</label>
+            <input type="text" class="form-control" id="assignedHours"  name="assignedHours" onblur="updatePointDisplay()"/>
+            <small class="form-text text-danger" style="display: none"
+              >Invalid input</small
+            >
+          </div>
+          <div class="col">
+            <label for="workPoint" class="form-label">Work Point</label>
+            <input type="text" class="form-control" id="workPoint", name="workPoint" />
+                <small class="form-text text-danger" style="display: none"
+                  >Invalid input</small
+            >
+          </div>
+            <div class="col">
+                <label for="submit" class="form-label"></label>
+               <button type="submit" class="btn btn-primary me-2">Assign</button>
+            </div>
+         </div>
 
-	<div class="col-2">
-		<label for="taskType" class="form-label">Task Type</label>
-		<select class="form-select" id="taskType" name="taskType">
-			{% for task in ["Uni Coordination", "Project Supervision", "Administration"] %}
-			<option value="{{ task }}">{{ task }}</option>
-			{% endfor %}
-		</select>
-	</div>
-
-	<div class="col-2">
-		<label for="taskName" class="form-label">Task Name</label>
-		<input type="text" class="form-control" id="taskName" name="taskName" required />
-		<small class="form-text text-danger" style="display: none">Invalid input</small>
-	</div>
-
-	<div class="col">
-		<label for="staffName" class="form-label">Staff Name</label>
-		<select class="form-select" id="staffName" name="staffName">
-			<option value="Mary">Mary</option>
-			<option value="Tom">Tom</option>
-			<option value="John">John</option>
-		</select>
-	</div>
-
-	<div class="col-2">
-		<label for="assignedHours" class="form-label">Assigned Hours</label>
-		<input type="text" class="form-control" id="assignedHours" name="assignedHours" />
-		<small class="form-text text-danger" style="display: none">Invalid input</small>
-	</div>
-
-	<div class="col d-flex align-items-end">
-		<button type="submit" class="btn btn-primary me-2">Assign</button>
-	</div>
-
-
-    </div>
   </form>
-    <button
+      <button
       class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
       onclick="addAssignmentRow()"
     >
@@ -122,6 +157,98 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
 </div>
 
 <script>
+    function openModal() {
+      var modal = document.getElementById("myModal");
+      modal.style.display = "block";
+    }
+
+    function closeModal() {
+      var modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
+
+    document.getElementById("submitContractHour").addEventListener("click", function() {
+      var contractHourInput = document.getElementById("contractHour");
+      var contractHour = parseFloat(contractHourInput.value);
+
+      if (!isNaN(contractHour)) {
+      var assignedHour = parseFloat(document.getElementById("assignedHours").value);
+      document.getElementById("workPoint").textContent = assignedHour / contractHour;
+      document.getElementById("workPoint").value = assignedHour / contractHour;
+
+        closeModal();
+      } else {
+        alert("Please enter a valid contract hour.");
+      }
+    });
+
+    function updatePointDisplay() {
+        var inputText = document.getElementById("staffId").value;
+        var inputText2 = document.getElementById("assignedHours").value;
+
+        if (inputText != "" && inputText2 != "") {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/getpoint", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+
+                    if (response.hasOwnProperty("contract_hour")) {
+                        var contractHour = parseFloat(response.contract_hour);
+                        var assignedHour = parseFloat(inputText2);
+                        document.getElementById("workPoint").textContent = assignedHour / contractHour;
+
+                    } else {
+                        {#var errorDiv = document.getElementById("errorDiv");#}
+                        {#errorDiv.textContent = "User not found."; // #}
+                        {#console.error("User not found.");#}
+                        {#errorDiv.style.display = "block";
+                        {#document.getElementById("workPoint").textContent = "";#}
+                        openModal();
+                    }
+                } else {
+                    console.error("Error: " + xhr.status);
+                }
+            };
+
+            var data = "staffId=" + encodeURIComponent(inputText);
+            xhr.send(data);
+        }
+    }
+
+    function updateTaskType() {
+        var category = document.getElementById("category").value;
+        var taskTypeSelect = document.getElementById("taskType");
+
+        var taskTypes = {
+            Service: ["ADMIN", "GA", "SDS"],
+            Teaching: ["CWS", "TEACH", "UDEV"],
+            Research: ["HDR", "ORES", "RES-MGMT", "RESERV"],
+            Leave: ["LSL", "PL", "SBL"]
+        };
+
+        taskTypeSelect.innerHTML = '';
+
+        taskTypes[category].forEach(function(task) {
+            addOption(taskTypeSelect, task, task);
+        });
+    }
+
+    function addOption(select, text, value) {
+        var option = document.createElement("option");
+        option.text = text;
+        option.value = value;
+        select.appendChild(option);
+    }
+
+    window.onload = function() {
+        document.getElementById("category").value = "Service";
+
+        updateTaskType();
+    };
+
   let asgNumber = 1;
 
   function addAssignmentRow() {
@@ -130,61 +257,71 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
 
     // Define the new row's HTML content
     let newRowHTML = `
-      <div class="row mt-2 assignmentRow">
-        <div class="col-2">
-          Assignment ${asgNumber}
-        </div>
+  <form method="POST" action="/assign">
+    <div class="row mt-2 assignmentRow">
+            <div class="col">
+                <select id="category" class="form-select" name="category" onchange="updateTaskType()">
+                    <option value="Service">Service</option>
+                    <option value="Teaching">Teaching</option>
+                    <option value="Research">Research</option>
+                    <option value="Leave">Leave</option>
+                </select>
+            <br>
+            </div>
+          <div class="col">
+            <select class="form-select" id="taskType" name="taskType">
+    {#          {% for task in ["Uni Coordination", "Project Supervision",#}
+    {#          "Administration"] %}#}
+    {#          <option value="{{ task }}">{{ task }}</option>#}
+    {#          {% endfor %}#}
+            </select>
+          </div>
+          <div class="col">
+            <select class="form-select" id="department"  name="department">
+              {% for dept in ["CSSE", "M&S", "Physics"] %}
+              <option value="{{ dept }}">{{ dept }}</option>
+              {% endfor %}
+            </select>
+          </div>
         <div class="col">
-          <select class="form-select" id="department">
-            {% for dept in ["CSSE", "M&S", "Physics"] %}
-            <option value="{{ dept }}">{{ dept }}</option>
-            {% endfor %}
-            <!-- 
-            For MySQL data fetching:
-            {% for dept in departments_from_database %}
-            <option value="{{ dept.id }}">{{ dept.name }}</option>
-            {% endfor %}
-            -->
-          </select>
+            <input type="text" class="form-control" id="staffId"  name="staffId" onblur="updatePointDisplay()"/>
+            <small class="form-text text-danger" style="display: none"
+              >Invalid input</small
+            >
+            <br>
         </div>
-        <div class="col-2">
-          <select class="form-select" id="taskType">
-            {% for task in ["Uni Coordination", "Project Supervision",
-            "Administration"] %}
-            <option value="{{ task }}">{{ task }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-2">
-          <input type="text" class="form-control" id="taskName" required />
-          <small class="form-text text-danger" style="display: none"
-            >Invalid input</small
-          >
-        </div>
+          <div class="col">
+            <input type="text" class="form-control" id="explanation" name="explanation" required />
+            <small class="form-text text-danger" style="display: none"
+              >Invalid input</small
+            >
+          </div>
         <div class="col">
-          <select class="form-select" id="staffName">
-            <option value="Mary">Mary</option>
-            <option value="Tom">Tom</option>
-            <option value="John">John</option>
-          </select>
+            <input type="text" class="form-control" id="unitCode" name="unitCode" />
+                <small class="form-text text-danger" style="display: none"
+                  >Invalid input</small
+            >
         </div>
-        <div class="col-2">
-          <input
-            type="text"
-            class="form-control"
-            id="assignedHours"
-          />
-          <small class="form-text text-danger" style="display: none"
-            >Invalid input</small
-          >
+          <div class="col">
+            <input type="text" class="form-control" id="assignedHours"  name="assignedHours" onblur="updatePointDisplay()"/>
+            <small class="form-text text-danger" style="display: none"
+              >Invalid input</small
+            >
+          </div>
+          <div class="col">
+            <input type="text" class="form-control" id="workPoint", name="workPoint" />
+                <small class="form-text text-danger" style="display: none"
+                  >Invalid input</small
+            >
+          </div>
+            <div class="col d-flex align-items-end">
+              <button type="submit" class="btn btn-primary me-2">Assign</button>
+              <button class="btn btn-danger me-2" onclick="removeAsgRow(this)">
+                Remove
+              </button>
+            </div>
         </div>
-        <div class="col d-flex align-items-end">
-          <button class="btn btn-primary me-2">Assign</button>
-          <button class="btn btn-danger me-2" onclick="removeAsgRow(this)">
-            Remove
-          </button>
-        </div>
-      </div>
+      </form>
     `;
 
     // Get the last assignment row
