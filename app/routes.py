@@ -78,15 +78,15 @@ def upload():
 
     # Changwu, for your consideration, i have imported WorkloadAllocation from models.py
         # Read and process the spreadsheet (e.g., using pandas)
-        import pandas as pd
-        df = pd.read_excel(temp_filepath)
+        #import pandas as pd
+        #df = pd.read_excel(temp_filepath)
 
         # Database update logic (e.g., using SQLAlchemy)
-        from sqlalchemy import create_engine
-        engine = create_engine('sqlite:///your_database.db')
-        df.to_sql('your_table_name', engine, if_exists='replace', index=False)
+        #from sqlalchemy import create_engine
+        #engine = create_engine('sqlite:///your_database.db')
+        #df.to_sql('your_table_name', engine, if_exists='replace', index=False)
 
-        return render_template('assign_workload.html', message='Upload and database update successful')
+        #return render_template('assign_workload.html', message='Upload and database update successful')
 
 
 
