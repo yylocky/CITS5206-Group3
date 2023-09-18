@@ -51,13 +51,45 @@
               >Edit Workload</a
             >
           </li>
-          {% if current_user.is_anonymous %}
+          <!-- The nav link for Comment History is only displayed to HoD users -->
+          {% if g.is_hod %}
+          <li>
+            <a
+              href="/comment_history"
+              class="{{ 'active' if request.endpoint == 'comment_history' }}"
+              >Comment History</a
+            >
+          </li>
+          {% endif %}
+          <!-- Notification Alert -->
+          <!-- The alert will only pop up if the global notification flag g is True. -->
+          <!-- g is defined under @app.before_request in routes.py -->
+          {% if g.show_notification %}
+          <li
+            class="alert alert-warning alert-dismissible fade show notification-alert"
+            role="alert"
+          >
+            New message(s) in Comment History!
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            >
+              &times;
+            </button>
+          </li>
+          {% endif %} {% if current_user.is_anonymous %}
           <li><a href="{{ url_for('login') }}">Login</a></li>
           {% else %}
           <li><a href="{{ url_for('logout') }}">Logout</a></li>
           {% endif %}
         </ul>
       </nav>
+      <!-- A hidden div for checking user role for conditional rendering in the below JavaScript-->
+      {% if not current_user.is_anonymous and g.is_hod %}
+      <div id="userRole" data-role="HoD" style="display: none"></div>
+      {% endif %}
     </header>
     {% with messages = get_flashed_messages() %} {% if messages %}
     <div class="flashes">
@@ -75,5 +107,57 @@
         IT Capstone Project by Group 3 of CITS5206@UWA, 2023 Semester 2
       </p>
     </footer>
+    <!-- Bootstrap's JavaScript library for closing the notification alert -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <!-- If current user is HoD, check for unread comments for displaying notification alert -->
+    <script>
+      // Listen for the event when the HTML document has been completely loaded and parsed
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get the role from the hidden div
+        const userRoleDiv = document.getElementById("userRole");
+
+        // Check if the div exists and has a data attribute "data-role" set to "HoD"
+        if (userRoleDiv && userRoleDiv.getAttribute("data-role") === "HoD") {
+          // Define a function to check for unread comments for the HoD
+          function checkForUnreadComments() {
+            // Make an HTTP request to the server to get the count of unread comments
+            fetch("/check_unread_comments") // check_unread_comments() is defined in routes.py
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json(); // Parse the response as JSON
+              })
+              .then((data) => {
+                // Select the HTML element used to display the notification alert
+                const notificationAlert = document.querySelector(
+                  ".notification-alert"
+                );
+                // Check if there are unread comments and the alert is currently hidden
+                if (
+                  data.unread_comments > 0 &&
+                  window.getComputedStyle(notificationAlert).display === "none"
+                ) {
+                  // If conditions are met, display the alert
+                  notificationAlert.style.display = "flex";
+                } else if (data.unread_comments === 0) {
+                  // If there are no unread comments, hide the alert
+                  notificationAlert.style.display = "none";
+                }
+              })
+              .catch((error) => {
+                console.error(
+                  "There was a problem with the fetch operation:",
+                  error.message
+                );
+              });
+          }
+
+          // Poll the checkForUnreadComments function every 1 second
+          setInterval(checkForUnreadComments, 1000);
+          // Possible enhancement: we may set up Flask-SocketIO for the server to push notifications to the client in real-time without the need for polling.
+        }
+      });
+    </script>
   </body>
 </html>

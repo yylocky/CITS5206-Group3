@@ -36,10 +36,15 @@ block styles %}
     </div>
     {% endif %}
   </div>
-
+  <!-- Start of changes made per the latest commit in the branch for Issue 14-->
   <div class="workload-table">
     <div class="filter-title">
       <p>Filter</p>
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Category"
+      />
       <input
         type="text"
         class="filter-input"
@@ -48,22 +53,17 @@ block styles %}
       <input
         type="text"
         class="filter-input"
-        placeholder="Filter by Task Type"
+        placeholder="Filter by Unit Code"
       />
       <input
         type="text"
         class="filter-input"
-        placeholder="Filter by Task Name"
+        placeholder="Filter by Staff Number"
       />
       <input
         type="text"
         class="filter-input"
-        placeholder="Filter by Staff Name"
-      />
-      <input
-        type="text"
-        class="filter-input"
-        placeholder="Filter by Assigned Hours"
+        placeholder="Filter by Explanation"
       />
 
       <button class="export-button">
@@ -71,54 +71,36 @@ block styles %}
         Export CSV
       </button>
     </div>
-    <!-- mockup dummy data -->
+
     <table>
       <thead>
         <tr>
-          <th>Department</th>
+          <th>Category</th>
           <th>Task Type</th>
-          <th>Task Name</th>
-          <th>Staff Name</th>
+          <th>Department</th>
+          <th>Unit Code</th>
+          <th>Staff Number</th>
+          <th>Explanation</th>
           <th>Assigned Hours</th>
+          <th>Workload Point</th>
         </tr>
       </thead>
 
       <tbody>
+        {% for workload in workloads %}
         <tr>
-          <td>CSSE</td>
-          <td>Uni Coordination</td>
-          <td>CITS1401</td>
-          <td>John</td>
-          <td>200</td>
+          <td>{{ workload.work.work_category }}</td>
+          <td>{{ workload.work.work_type }}</td>
+          <!-- add if condition depends on the worktype -->
+          <td>{{ workload.user.department.dept_name }}</td>
+          <td>{{ workload.work.unit_code }}</td>
+          <td>{{ workload.user.username }}</td>
+          <td>{{ workload.work.work_explanation }}</td>
+          <td>{{ workload.hours_allocated }}</td>
+          <td>{{ workload.workload_point }}</td>
         </tr>
-        <tr>
-          <td>M&S</td>
-          <td>Project Supervision</td>
-          <td>Project or Unit name</td>
-          <td>Jenny</td>
-          <td>20</td>
-        </tr>
-        <tr>
-          <td>Physics</td>
-          <td>Administration</td>
-          <td>ABC Program Chair</td>
-          <td>Adam</td>
-          <td>30</td>
-        </tr>
-        <tr>
-          <td>CSSE</td>
-          <td>Uni Coordination</td>
-          <td>CITS1402</td>
-          <td>John</td>
-          <td>200</td>
-        </tr>
-        <tr>
-          <td>M&S</td>
-          <td>Project Supervision</td>
-          <td>Project or Unit name</td>
-          <td>James</td>
-          <td>20</td>
-        </tr>
+        {% endfor %}
+        <!-- End of changes made per the latest commit in the branch for Issue 14-->
       </tbody>
     </table>
     <!-- <table>
