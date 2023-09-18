@@ -115,12 +115,12 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
 
     -->
 
-    <!-- 20230918 MW: Form to upload work allocation spreadsheet for bulk assignment-->
-    <form action="/assign_workload" method="POST" enctype="multipart/form-data">
-      <input type="file" id= "assignsheet" name="file" accept=".xlsx, .xls, .csv, .tsv">
-      <input type="submit" value="Upload" class="btn btn-primary">
+    <!-- Form 2 -->
+    <form id="form2" method="POST" action="/handleForm2" enctype="multipart/form-data">
+      <!-- File input field -->
+      <input type="file" name="spreadsheet" accept=".xls,.xlsx">
+      <button type="submit" class="btn btn-primary me-2">Upload</button>
     </form>
-    
   </div>
 
   <!-- Approval of Uploaded Assignment Section -->

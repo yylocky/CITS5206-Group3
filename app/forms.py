@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextA
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
 from app.models import User
 
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -32,4 +33,3 @@ class SignupForm(FlaskForm):
     def validate_confirm_password(self, confirm_password):
         if confirm_password.data != self.password.data:
             raise ValidationError('Passwords must match.')
-
