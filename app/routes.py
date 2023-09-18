@@ -1,12 +1,16 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login, User, Role
+from app.models import Login, User, Role, WorkloadAllocation
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
 import re
+import os
 import random
 from flask import session
+
+
 
 # decorator for login page
 
@@ -43,17 +47,56 @@ def view_workload():
     # users=User.query.all() # Just using user table for mockup
     return render_template('view_workload.html', title='View Workload')#, users=users)
 
+# Definitions for file type validation - MW
+ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'}
+# Check if filename has "." and whether the extension is in the allow extensions list. - MW
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/assign_workload')
+# decorator for assign_workload page
+@app.route('/assign_workload', methods=['POST'])
 @login_required
 def assign():
     return render_template('assign_workload.html', title='Assign Workload')
+# validation for upload file type at the backend - MW
+def upload():
+    file = request.files['file']
 
-@app.route('/edit_allocation_detail')
-@login_required
-def edit_allocation_detail():
-    role_name = get_session()
-    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name)
+    if file.filename == '':
+        # return render_template('assign_workload.html', message='No selected file')
+        flash('No file selected.')
+        return redirect(url_for('upload'))
+    
+    if not allowed_file(file.filename):
+        flash('Invalid file type. Only Excel, CSV or TSV files allowed.') # cant remove csv or tsv or even xls if it is too hard. Or we can just limit this to xlsx. but the save function will convert his to xlsx
+        return redirect(url_for('upload'))
+
+    if file:
+        # Save the uploaded file temporarily for further processing
+        temp_filepath = '/tmp/uploaded_spreadsheet.xlsx'
+        file.save(temp_filepath)
+
+    # Changwu, for your consideration, i have imported WorkloadAllocation from models.py
+        # Read and process the spreadsheet (e.g., using pandas)
+        import pandas as pd
+        df = pd.read_excel(temp_filepath)
+
+        # Database update logic (e.g., using SQLAlchemy)
+        from sqlalchemy import create_engine
+        engine = create_engine('sqlite:///your_database.db')
+        df.to_sql('your_table_name', engine, if_exists='replace', index=False)
+
+        return render_template('assign_workload.html', message='Upload and database update successful')
+
+
+
+# 20230918 MW: Remove as no longer required
+# @app.route('/edit_allocation_detail')
+#def edit_allocation_detail():
+#    role_name = get_session()
+#    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name)
+
+
 
 
 def set_session(user):

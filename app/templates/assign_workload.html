@@ -82,6 +82,7 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
   <!-- File Upload Section -->
   <h3 class="mt-5">File Upload [HoS / HoDs / Admin]</h3>
   <div class="uploadContainer">
+    <!-- MW: 20230918 Comment out the old codes
     <div class="row mt-2 uploadRow">
       <div class="col-2">
         <label class="form-label">Spreadsheet No.</label>
@@ -102,6 +103,8 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
       <div class="col d-flex align-items-end">
         <button class="btn btn-primary me-2">Upload</button>
       </div>
+
+
     </div>
     <button
       class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
@@ -109,6 +112,15 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
     >
       Add File
     </button>
+
+    -->
+
+    <!-- 20230918 MW: Form to upload work allocation spreadsheet for bulk assignment-->
+    <form action="/assign_workload" method="POST" enctype="multipart/form-data">
+      <input type="file" id= "assignsheet" name="file" accept=".xlsx, .xls, .csv, .tsv">
+      <input type="submit" value="Upload" class="btn btn-primary">
+    </form>
+    
   </div>
 
   <!-- Approval of Uploaded Assignment Section -->
