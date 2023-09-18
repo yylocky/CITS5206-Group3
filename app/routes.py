@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login, User, WorkloadAllocation, Role
+from app.models import Login, User, WorkloadAllocation, Role, Work
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
 import re
@@ -37,9 +37,7 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# decorator for view_workload page
-
-
+# decorator for filtered view_workload page from notification
 @app.route('/view_workload')
 @login_required
 def view_workload():
@@ -56,6 +54,24 @@ def view_workload():
 
     return render_template('view_workload.html', title='View Workload', workloads=workloads)
 
+# decorator for view all workload page
+@app.route('/view_all_workload')
+@login_required
+def view_all_workload():
+    role_id = current_user.user.role_id
+    # if current user is admin(4) or hod(1), show all workload
+    if role_id == 4 or role_id == 1:
+        workloads = WorkloadAllocation.query.all()
+
+    # if current user is HoD(2), show only their department workload
+    elif role_id == 2:
+        workloads = WorkloadAllocation.query.join(Work, Work.work_id == WorkloadAllocation.work_id).filter(Work.dept_id == current_user.user.dept_id).all()
+
+    # if current user is staff(3), show only their workload
+    elif role_id == 3:
+        workloads = WorkloadAllocation.query.filter_by(username=current_user.username).all()
+
+    return render_template('view_all_workload.html', title='View All Workload', workloads=workloads)
 
 @app.route('/assign_workload')
 @login_required
