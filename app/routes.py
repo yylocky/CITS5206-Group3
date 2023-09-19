@@ -82,6 +82,8 @@ def upload_file():
         for column_name in expected_columns:
             if column_name not in sheet['1']:
                 return False, f"Column '{column_name}' is missing in 'Sheet1'. This may not be the right spreadsheet"
+            else:
+                return "Right Excel file."
 
         try:
             df = pd.read_excel(file)
