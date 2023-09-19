@@ -75,140 +75,137 @@ def upload_file():
 
     if file.filename != "":
 
-        #validate the spreadsheet
-        workbook = load_workbook(file)
-        sheet = workbook['Sheet1']
-        expected_columns = ['Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation']
-        for column_name in expected_columns:
-            if column_name not in sheet['1']:
-                return False, f"Column '{column_name}' is missing in 'Sheet1'. This may not be the right spreadsheet"
-            else:
-                # insert DB
-                try:
-                    df = pd.read_excel(file)
-                    print("Uploaded Data:")
-                    print(df)
+        # #validate the spreadsheet
+        # workbook = load_workbook(file)
+        # sheet = workbook['Sheet1']
+        # expected_columns = ['Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation']
+        # for column_name in expected_columns:
+        #     if column_name not in sheet['1']:
+        #         return False, f"Column '{column_name}' is missing in 'Sheet1'. This may not be the right spreadsheet"
+        #     else:
+        #         # insert DB
+        try:
+            df = pd.read_excel(file)
+            print("Uploaded Data:")
+            print(df)
 
-                    for index, row in df.iterrows():
-                        print(f"Row {index + 1}:")
-                        print("Code:", row["Staff ID"])
-                        print("Task Type:", row["Task Type"])
-                        print("Title:", row["UnitCode"])
-                        print("Dept:", row["Department"])
+            for index, row in df.iterrows():
+                print(f"Row {index + 1}:")
+                print("Code:", row["Staff ID"])
+                print("Task Type:", row["Task Type"])
+                print("Title:", row["UnitCode"])
+                print("Dept:", row["Department"])
 
-                        print("Comment:", row["Comment"])
-                        print("Staff:", row["Role"])
-                        print("WkldHours:", row["WorkloadHours"])
+                print("Comment:", row["Comment"])
+                print("Staff:", row["Role"])
+                print("WkldHours:", row["WorkloadHours"])
 
-                        print("-" * 20)
+                print("-" * 20)
 
-                        k_work_id = row["Staff ID"]
-                        k_username = k_work_id
-                        k_hours_allocated = row["WorkloadHours"]
-                        k_workload_point = 0.5
-                        k_comment = row["Comment"]
-                        k_comment_status = 'Unread'
-                        k_taskType = row["Task Type"]
-                        k_unit_code = row["UnitCode"]
+                k_work_id = row["Staff ID"]
+                k_username = k_work_id
+                k_hours_allocated = row["WorkloadHours"]
+                k_workload_point = 0.5
+                k_comment = row["Comment"]
+                k_comment_status = 'Unread'
+                k_taskType = row["Task Type"]
+                k_unit_code = row["UnitCode"]
 
-                        explanation = ""
+                explanation = ""
 
-                        department_name = row["Department"]
-                        k_depart = Department.query.filter_by(dept_name=department_name).first()
-                        if k_depart:
-                            k_dept_id = k_depart.dept_id+1
-                        else:
-                            k_dept_id = random.randint(1,10000)
-                        
-                        role_name = row["Role"]
-                        k_role = Role.query.filter_by(role_name=role_name).first()
-                    
-                        if k_role:
-                            k_role_id = k_role.role_id+1
-                        else:
-                            k_role_id = random.randint(1,10000)
-
-
-                        # #workload
-                        k_workload_allocation = WorkloadAllocation(
-                            work_id=str(k_work_id),
-                            hours_allocated=float(k_hours_allocated),
-                            username=str(k_username),
-                            comment=k_comment,
-                            comment_status=k_comment_status,
-                            workload_point=float(k_workload_point)
-                        )
-
-                        db.session.add(k_workload_allocation)
-                        db.session.commit()
-
-                        
-                        
-
-                        # #work
-                        # k_work_explanation = "Some explanation for " + k_taskType
-                        if k_taskType == 'ADMIN':
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'CWS':
-                            explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
-                        if k_taskType == "GA":
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'HDR':
-                            explanation = "HDR sup of" + k_work_id
-                        if k_taskType == 'NEMP':
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'CWS':
-                            explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
-                        if k_taskType == 'RESERV':
-                            explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
-                        if k_taskType == 'RES - MGMT':
-                            explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
-                        if k_taskType == 'SDS':
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'TEACH':
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'UDEV':
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'LSL':
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'PL':
-                            explanation = role_name + "in" + k_unit_code
-                        if k_taskType == 'SBL':
-                            explanation = role_name + "in" + k_unit_code
-
-                        k_work = Work(
-                            # work_id=k_work_id,
-                            work_explanation=explanation,
-                            work_type=k_taskType,
-                            dept_id=k_dept_id,
-                            unit_code=k_unit_code
-                        )
-                        #
-                        db.session.add(k_work)
-                        db.session.commit()
-
-                        # user
+                department_name = row["Department"]
+                k_depart = Department.query.filter_by(dept_name=department_name).first()
+                if k_depart:
+                    k_dept_id = k_depart.dept_id+1
+                else:
+                    k_dept_id = random.randint(1,10000)
+                
+                role_name = row["Role"]
+                k_role = Role.query.filter_by(role_name=role_name).first()
+            
+                if k_role:
+                    k_role_id = k_role.role_id+1
+                else:
+                    k_role_id = random.randint(1,10000)
 
 
-                        k_user = User(
-                            # username=random.randint(0, 100000),
-                            username = k_username,
-                            role_id=k_role_id,
-                            # alloc_id=random.randint(0, 120),
-                            leave_hours=float(0),
-                            contract_hour=0,
-                            available_hours=0,
-                            dept_id=k_dept_id
-                        )
+                # #workload
+                k_workload_allocation = WorkloadAllocation(
+                    work_id=str(k_work_id),
+                    hours_allocated=float(k_hours_allocated),
+                    username=str(k_username),
+                    comment=k_comment,
+                    comment_status=k_comment_status,
+                    workload_point=float(k_workload_point)
+                )
 
-                        db.session.add(k_user)
-                        db.session.commit()
+                db.session.add(k_workload_allocation)
+                db.session.commit()
 
-                        
+                
+                
 
-                    return "File uploaded and data stored as TaskData objects successfully."
-                except Exception as e:
-                    return f"Error: {str(e)}"
+                # #work
+                # k_work_explanation = "Some explanation for " + k_taskType
+                if k_taskType == 'ADMIN':
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'CWS':
+                    explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                if k_taskType == "GA":
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'HDR':
+                    explanation = "HDR sup of" + k_work_id
+                if k_taskType == 'NEMP':
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'CWS':
+                    explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                if k_taskType == 'RESERV':
+                    explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                if k_taskType == 'RES - MGMT':
+                    explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                if k_taskType == 'SDS':
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'TEACH':
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'UDEV':
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'LSL':
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'PL':
+                    explanation = role_name + "in" + k_unit_code
+                if k_taskType == 'SBL':
+                    explanation = role_name + "in" + k_unit_code
+
+                k_work = Work(
+                    # work_id=k_work_id,
+                    work_explanation=explanation,
+                    work_type=k_taskType,
+                    dept_id=k_dept_id,
+                    unit_code=k_unit_code
+                )
+                #
+                db.session.add(k_work)
+                db.session.commit()
+
+                # user
+
+
+                k_user = User(
+                    # username=random.randint(0, 100000),
+                    username = k_username,
+                    role_id=k_role_id,
+                    # alloc_id=random.randint(0, 120),
+                    leave_hours=float(0),
+                    contract_hour=0,
+                    available_hours=0,
+                    dept_id=k_dept_id
+                )
+
+                db.session.add(k_user)
+                db.session.commit()
+            return "File uploaded and data stored as TaskData objects successfully."
+        except Exception as e:
+            return f"Error: {str(e)}"
 
     return "No file selected for upload."
 if __name__ == '__main__':
