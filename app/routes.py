@@ -9,6 +9,7 @@ from werkzeug.urls import url_parse
 import pandas as pd
 import re
 import random
+from openpyxl import load_workbook
 
 # decorator for login page
 
@@ -73,6 +74,15 @@ def upload_file():
         return "Invalid file type. Please upload a valid Excel file." #MW
 
     if file.filename != "":
+
+        #validate the spreadsheet
+        workbook = load_workbook(file)
+        sheet = workbook['Sheet1']
+        expected_columns = ['Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation']
+        for column_name in expected_columns:
+            if column_name not in sheet['1']:
+                return False, f"Column '{column_name}' is missing in 'Sheet1'. This may not be the right spreadsheet"
+
         try:
             df = pd.read_excel(file)
             print("Uploaded Data:")
