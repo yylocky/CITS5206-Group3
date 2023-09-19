@@ -82,12 +82,7 @@ def upload_file():
         data = sheet.values
         data = list(data)
         headings = data[0] # Assuming the headings are in the first row
-        print (headings) # test
-        print (type(headings))
         expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation')
-        print (type(expected_headings))
-        # missing_headings = [heading for heading in expected_headings if heading not in headings]
-        # print (missing_headings)
 
         if expected_headings != headings:
             return "This may not be the right spreadsheet as it does not pass the content validation."
