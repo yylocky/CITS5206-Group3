@@ -108,9 +108,15 @@ block styles %}
           <!-- if work type is LSL, PL, SBL, then department is user's department, 
                 else department is work's department -->
           <td>
-            {% if workload.work.work_type in ['LSL', 'PL', 'SBL'] %}
-            {{workload.user.department.dept_name }} {% else %}
-            {{workload.work.department.dept_name }} {% endif %}
+              {% if workload.work.work_type in ['LSL', 'PL', 'SBL'] %}
+              {{workload.user.department.dept_name }}
+              {% else %}
+              {{workload.work.department.dept_name }}
+              {% endif %}
+          </td>
+          
+          </td>
+          
           </td>
           <td>{{ workload.work.unit_code }}</td>
           <td>{{ workload.user.username }}</td>
@@ -241,10 +247,10 @@ block styles %}
   function generateCSVContent(rows) {
     const headers = Array.from(
       document.querySelectorAll(".workload-table th")
-    ).map((header) => header.textContent);
+    ).map((header) => header.textContent.trim());
     const rowsContent = rows.map((row) =>
       Array.from(row.querySelectorAll("td"))
-        .map((cell) => cell.textContent)
+        .map((cell) => cell.textContent.trim())
         .join(",")
     );
 
