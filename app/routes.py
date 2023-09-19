@@ -61,10 +61,16 @@ def dashboard():
     return render_template('dashboard.html', title='Dashboard')
 
 
-
+# Upload function, including validate file type - MW
+ALLOWED_EXTENSIONS = {'xlsx', 'xls'} # MW
 @app.route("/upload", methods=["POST"])
 def upload_file():
     file = request.files["file"]
+
+    file_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else '' # MW
+    
+    if file_extension not in ALLOWED_EXTENSIONS: #MW
+        return "Invalid file type. Please upload a valid Excel file." #MW
 
     if file.filename != "":
         try:
