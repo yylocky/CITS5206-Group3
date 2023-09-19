@@ -8,35 +8,31 @@ body {
 header {
   height: 100px;
   background-color: rgb(40, 52, 139);
-  padding: 0 3px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Distribute the space between logo and nav links */
-}
-
-/* Reset the default padding and margin on the ul or body elements from either the browser's default styles or from Bootstrap's styles */
-body,
-ul {
-  margin: 0;
-  padding: 0;
-}
-
-nav {
-  width: 98%;
+  justify-content: space-between; /* distribute the space between logo and nav links */
 }
 
 .logo {
-  max-width: 180px;
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+  margin-right: 10px;
+}
+nav{
+  height: 86.73px;
 }
 
 nav ul {
+  list-style-type: none;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center; /* Center align nav links */
+  flex: 1; /* Allow nav links to occupy the remaining width */
 }
 
 nav ul li {
-  margin: 0 10px;
+  margin: 0 20px;
   align-items: center; /* Align UWA logo with other elements in the nav bar */
   display: flex;
 }
@@ -58,8 +54,7 @@ nav ul li a:hover {
 
 /* last-child = login/logout button */
 nav ul li:last-child {
-  margin-left: auto;
-  width: 80px;
+  width: 200px;
   justify-content: flex-end;
 }
 
@@ -75,7 +70,7 @@ nav ul li:last-child a:hover {
   color: white;
 }
 
-/* Nav link effects for active page */
+/* Effects for active page */
 nav ul li a.active {
   background-color: rgba(255, 255, 255, 0.1);
   border-bottom: 3px solid white;
@@ -92,7 +87,7 @@ nav ul li a.active {
   padding: 10px;
   border-radius: 5px;
   position: relative;
-  z-index: 2; /* Ensure the flash messages are on top of the background video */
+  z-index: 2; /* Ensure the flash messages are on the top the background video */
 }
 
 footer {
@@ -106,30 +101,26 @@ footer {
   font-size: 14px;
 }
 
-.notification-alert {
-  display: none; /* The alert is only displayed if there is any Unread comments in the work_allocation table AND the dept_id of the commenter equals to that of the current HoD user */
-  background-color: #ffcc00;
-  padding: 18px 4px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  color: #333;
-  width: 160px;
-  height: 25px;
-  text-align: center;
-  margin-left: auto; /* Place the alert just between the last nav link and the login/logout button */
-  overflow: hidden;
+nav ul{
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+
 }
 
-.notification-alert .btn-close {
-  width: 30px;
-  height: 30px;
-  background-color: transparent;
-  border: 0;
-  opacity: 10;
-  font-size: 2rem; /* Size of the cross */
+footer p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
 }
 
-.notification-alert .btn-close:hover {
-  cursor: pointer;
-  opacity: 0.5;
-}
+/* Additional styles can be added as needed */
