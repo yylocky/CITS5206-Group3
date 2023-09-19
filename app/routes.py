@@ -81,10 +81,10 @@ def upload_file():
         sheet = workbook.active
         data = sheet.values
         data = list(data)
-        headings = data[0]  # Assuming the headings are in the first row
+        headings = data[0] # Assuming the headings are in the first row
         print (headings) # test
         print (type(headings))
-        expected_headings = ['Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation']
+        expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation')
         print (type(expected_headings))
         missing_headings = [heading for heading in expected_headings if heading not in headings]
         print (missing_headings)
