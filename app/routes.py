@@ -61,12 +61,15 @@ def edit_allocation_detail():
 
         user = User.query.filter_by(username=session.get('username', '')).first()
         work = Work.query.filter_by(dept_id=user.dept_id).first()
+        work_id = 1
+        if work is not None:
+            work_id = work.work_id
         hours_allocated = 4
         workload_point = 10
         comment_status = 'Unread'
 
         info = WorkloadAllocation(
-            work_id=work.work_id,
+            work_id=work_id,
             hours_allocated=hours_allocated,
             workload_point=workload_point,
             username=user.username,
