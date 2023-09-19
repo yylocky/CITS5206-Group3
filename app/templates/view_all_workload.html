@@ -130,10 +130,11 @@ block styles %}
   const rows = document.querySelectorAll(".workload-table tbody tr");
 
   filterInputs.forEach((input) => {
+    // Filter table when user types in the input
     input.addEventListener("input", () => {
       applyFilter();
     });
-
+    // Filter table when user presses enter
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         applyFilter();
@@ -147,6 +148,8 @@ block styles %}
       let shouldHideRow = false;
 
       Array.from(columns).forEach((column, index) => {
+        // Case insensitive matching
+        // If the column doesn't contain the input, hide the row
         if (
           !column.innerText
             .toLowerCase()
@@ -219,10 +222,12 @@ block styles %}
   });
 
   function exportToCSV() {
+    // Only export the rows that are visible
     const filteredRows = Array.from(rows).filter(
       (row) => row.style.display !== "none"
     );
     const csvContent =
+      // for downloading csv file
       "data:text/csv;charset=utf-8," +
       encodeURI(generateCSVContent(filteredRows));
 
@@ -232,6 +237,7 @@ block styles %}
     link.click();
   }
 
+  // Generate CSV content from the rows
   function generateCSVContent(rows) {
     const headers = Array.from(
       document.querySelectorAll(".workload-table th")
