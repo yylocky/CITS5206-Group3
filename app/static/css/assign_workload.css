@@ -168,3 +168,25 @@ body {
 .assignmentRow button:hover {
   background-color: rgb(40, 52, 139);
 }
+
+nav ul{
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+
+}
+
+nav ul li{
+  margin-top: 3px;
+}
+
+nav ul li:first-child{
+  margin-top: 0;
+}

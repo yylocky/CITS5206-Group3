@@ -1,14 +1,13 @@
-{% extends "base.html" %} {% block title %} Sign Up | My Dating Website {%
-endblock %} {% block styles %}
+{% extends "base.html" %}
+{% block title %} Workload edit allocation detail page {% endblock %}
+{% block styles %}
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/base.css') }}"
 />
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/edit_allocation_detail.css') }}"
-/>
-{% endblock %} {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_allocation_detail.css') }}" />
+{% endblock %}
+{% block content %}
 <div class="container">
   <h1>Edit Workload</h1>
 </div>
@@ -74,7 +73,7 @@ endblock %} {% block styles %}
     </tbody>
   </table>
 </div>
-
+{% if role_name == 'HoS' or role_name == 'HoD' or role_name == 'Admin' %}
 <div class="container">
   <button class="btn btn-primary me-2">Modify</button>
   <!-- <button
@@ -84,7 +83,7 @@ endblock %} {% block styles %}
     Add Modification
   </button> -->
 </div>
-
+{% endif %}
 <div class="container">
   <div class="mb-6">
     <!-- <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label> -->

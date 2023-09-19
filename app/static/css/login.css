@@ -99,6 +99,23 @@ body {
   font-size: 12px;
 }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 3bd04079294ba544a52a6462482878a58b80cded
+nav ul li{
+  margin-top: 3px;
+}
+
+nav ul li:first-child{
+  margin-top: 0;
+}
+
+/* Additional styles can be added as needed */
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 3bd04079294ba544a52a6462482878a58b80cded
 #login-form {
   display: flex;
   flex-wrap: wrap; /* Allow the contents to wrap if necessary */
@@ -129,3 +146,7 @@ body {
   font-size: 20px;
   cursor: pointer;
 }
+<<<<<<< HEAD
+>>>>>>> 36803eb76fe2fe66515fbcc2f3d4f1e35eeaa423
+=======
+>>>>>>> 3bd04079294ba544a52a6462482878a58b80cded
