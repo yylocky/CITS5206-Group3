@@ -62,7 +62,7 @@ def dashboard():
 
 
 # Upload function, including validate file type - MW
-ALLOWED_EXTENSIONS = {'xlsx', 'xls'} # MW
+ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'} # MW
 @app.route("/upload", methods=["POST"])
 def upload_file():
     file = request.files["file"]
