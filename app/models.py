@@ -77,6 +77,16 @@ class WorkloadAllocation(db.Model):
     comment_status = db.Column(db.String(64))
     user = db.relationship('User', backref='workload_allocations')
     work = db.relationship('Work', backref='workload_allocations')
+
+    def __init__(self, work_id, hours_allocated, workload_point, username, comment, comment_status):
+        super(WorkloadAllocation, self).__init__()
+        self.work_id = work_id
+        self.hours_allocated = hours_allocated
+        self.workload_point = workload_point
+        self.username = username
+        self.comment = comment
+        self.comment_status = comment_status
+
     __table_args__ = (
         db.CheckConstraint(comment_status.in_(['Read', 'Unread']), name='comment_status_check'), 
         db.CheckConstraint('workload_point == hours_allocated / user.contract_hour', name='workload_point_check'),

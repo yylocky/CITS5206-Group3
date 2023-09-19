@@ -129,7 +129,4 @@ footer {
   font-size: 2rem; /* Size of the cross */
 }
 
-.notification-alert .btn-close:hover {
-  cursor: pointer;
-  opacity: 0.5;
-}
+/* Additional styles can be added as needed */
