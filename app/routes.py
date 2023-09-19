@@ -73,6 +73,21 @@ def upload_file():
         return "Invalid file type. Please upload a valid Excel file." #MW
 
     if file.filename != "":
+
+#validate the spreadsheet
+        workbook = load_workbook(file)
+        sheet = workbook.active
+        data = sheet.values
+        data = list(data)
+        headings = data[0] # Assuming the headings are in the first row
+        expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation')
+
+        if expected_headings != headings:
+            return "This may not be the right spreadsheet as it does not pass the content validation."
+        
+        else:
+            # insert DB
+
         try:
             df = pd.read_excel(file)
             print("Uploaded Data:")
