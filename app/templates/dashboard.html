@@ -1,48 +1,141 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
-<style>
-    nav ul li:last-child a{
-        padding: 2px 10px;
-    }
-    footer p{
-        color: #000;
-    }
-</style>
-<div class="content-container">
-  <div class="main-content">
-    <div class="top">
-      <div class="left">
-        <h1>Hello, Mark Reynolds</h1>
-        <p>Following is Your Workload summary</p>
-      </div>
-      <div class="right">
-        <div class="userInfo">
-          <h2>Mark Reynolds</h2>
-          <p>markreynolds@uwa.edu.au</p>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
+    <style>
+        nav ul li:last-child a {
+            padding: 2px 10px;
+        }
+
+        footer p {
+            color: #000;
+        }
+    </style>
+    <div class="content-container">
+        <div class="main-content">
+            <div class="top">
+                <div class="left">
+                    <h1>Hello, Mark Reynolds</h1>
+                    <p>Following is Your Workload summary</p>
+                </div>
+                <div class="right">
+                    <div class="userInfo">
+                        <h2>Mark Reynolds</h2>
+                        <p>markreynolds@uwa.edu.au</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bottomContent">
+                <table class="table">
+                    <tr>
+                        <th>Department</th>
+                        <th>Task Type</th>
+                        <th>Task Name</th>
+                        <th>Assigned Hours</th>
+                    </tr>
+                    <tr>
+                        <td>M&S</td>
+                        <td>Project Supervision</td>
+                        <td>CITS5206</td>
+                        <td>10</td>
+                    </tr>
+                    <!-- More rows here -->
+                </table>
+            </div>
+            <div id="container1" style="height: 300px; margin-top: 30px;"></div>
+            <div id="container2" style="height: 300px; margin-top: 30px;"></div>
         </div>
-      </div>
     </div>
-    <div class="bottomContent">
-      <table class="table">
-        <tr>
-          <th>Department</th>
-          <th>Task Type</th>
-          <th>Task Name</th>
-          <th>Assigned Hours</th>
-        </tr>
-        <tr>
-          <td>M&S</td>
-          <td>Project Supervision</td>
-          <td>CITS5206</td>
-          <td>10</td>
-        </tr>
-        <!-- More rows here -->
-      </table>
-    </div>
-  </div>
-</div>
-</html>
+    </html>
+    <script type="text/javascript" src="../static/js/echarts.min.js"></script>
+    <script>
+        var chartDom = document.getElementById('container1');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        option = {
+            title: {
+                text: 'weekly',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['Hours']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {}
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    data: [3, 5, 5, 7, 6, 8, 5],
+                    type: 'bar',
+                    showBackground: true,
+                    backgroundStyle: {
+                        color: 'rgba(180,180,180,0.2)'
+                    }
+                }
+            ]
+        };
+
+        option && myChart.setOption(option);
+
+
+        var chartDom = document.getElementById('container2');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        option = {
+            title: {
+                text: 'monthly',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['Hours']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {}
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    data: [60, 66, 50, 58, 59, 68, 65, 70, 79, 68, 80, 73],
+                    type: 'line'
+                }
+            ]
+        };
+
+        option && myChart.setOption(option);
+
+    </script>
 {% endblock %}
