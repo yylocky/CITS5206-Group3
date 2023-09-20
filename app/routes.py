@@ -85,7 +85,7 @@ def upload_file():
 
         if expected_headings != headings:
             # return "This may not be the right spreadsheet as it does not pass the content validation."
-            flash('Invalid spreedsheet, please upload again')
+            flash('Invalid spreedsheet, please upload again') # MW
             return redirect(url_for('upload')) #mw
         
         else:
