@@ -33,20 +33,3 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
-
-
-	class TaskData1(db.Model):
-	    id = db.Column(db.Integer, primary_key=True)
-	    department = db.Column(db.String(64))
-	    task_type = db.Column(db.String(64))
-	    task_name = db.Column(db.String(64))
-	    assigned_hours = db.Column(db.Float)
-	    staff_name = db.Column(db.String(64))
-
-    def __repr__(self):
-        return f'<TaskData1 {self.id}>'
-
-
-
-    
