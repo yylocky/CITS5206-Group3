@@ -70,11 +70,12 @@ def upload_file():
     file_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else '' # MW
     
     if file_extension not in ALLOWED_EXTENSIONS: #MW
-        return "Invalid file type. Please upload a valid Excel file." #MW
-
+        # return "Invalid file type. Please upload a valid Excel file." #MW
+        flash('Invalid file type, please upload again') #MW
+        return redirect(url_for('upload')) #mw
+    
     if file.filename != "":
-
-#validate the spreadsheet
+        #validate the spreadsheet
         workbook = load_workbook(file)
         sheet = workbook.active
         data = sheet.values
@@ -83,7 +84,9 @@ def upload_file():
         expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation')
 
         if expected_headings != headings:
-            return "This may not be the right spreadsheet as it does not pass the content validation."
+            # return "This may not be the right spreadsheet as it does not pass the content validation."
+            flash('Invalid spreedsheet, please upload again')
+            return redirect(url_for('upload')) #mw
         
         else:
             # insert DB
