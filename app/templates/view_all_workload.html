@@ -1,0 +1,260 @@
+{% extends "base.html" %} {% block title %} view_workload {% endblock %} {%
+block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/base.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/homepage.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/view_workload.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="content-wrapper">
+  <div class="homepage-box-container">
+    <div class="title">
+      <p>View Workload</p>
+    </div>
+
+    {% if not current_user.is_authenticated %}
+    <div class="login-box">
+      <h3>
+        <i class="fas fa-sign-in-alt"></i>
+        <a href="{{ url_for('login') }}">Log In</a>
+      </h3>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="workload-table">
+    <!-- filters -->
+    <div class="filter-title">
+      <p>Filter</p>
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Category"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Task Type"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Department"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Unit Code"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Staff Number"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Explanation"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Assigned Hours"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Workload Point"
+      />
+    </div>
+    <div class="filter-title">
+      <!-- export csv -->
+      <button class="export-button">
+        <i class="fas fa-file-export"></i>
+        Export CSV
+      </button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable">Category <i class="fas fa-sort"></i></th>
+          <th class="sortable">Task Type <i class="fas fa-sort"></i></th>
+          <th class="sortable">Department <i class="fas fa-sort"></i></th>
+          <th class="sortable">Unit Code <i class="fas fa-sort"></i></th>
+          <th class="sortable">Staff Number <i class="fas fa-sort"></i></th>
+          <th class="sortable">Explanation <i class="fas fa-sort"></i></th>
+          <th class="sortable">Assigned Hours <i class="fas fa-sort"></i></th>
+          <th class="sortable">Workload Point <i class="fas fa-sort"></i></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for workload in workloads %}
+        <tr>
+          <td>{{ workload.work.work_category }}</td>
+          <td>{{ workload.work.work_type }}</td>
+          <!-- if work type is LSL, PL, SBL, then department is user's department, 
+                else department is work's department -->
+          <td>
+              {% if workload.work.work_type in ['LSL', 'PL', 'SBL'] %}
+              {{workload.user.department.dept_name }}
+              {% else %}
+              {{workload.work.department.dept_name }}
+              {% endif %}
+          </td>
+          
+          </td>
+          
+          </td>
+          <td>{{ workload.work.unit_code }}</td>
+          <td>{{ workload.user.username }}</td>
+          <td>{{ workload.work.work_explanation }}</td>
+          <td>{{ workload.hours_allocated }}</td>
+          <td>{{ workload.workload_point }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // Filter table
+  const filterInputs = document.querySelectorAll(".filter-input");
+  const rows = document.querySelectorAll(".workload-table tbody tr");
+
+  filterInputs.forEach((input) => {
+    // Filter table when user types in the input
+    input.addEventListener("input", () => {
+      applyFilter();
+    });
+    // Filter table when user presses enter
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        applyFilter();
+      }
+    });
+  });
+
+  function applyFilter() {
+    rows.forEach((row) => {
+      const columns = row.getElementsByTagName("td");
+      let shouldHideRow = false;
+
+      Array.from(columns).forEach((column, index) => {
+        // Case insensitive matching
+        // If the column doesn't contain the input, hide the row
+        if (
+          !column.innerText
+            .toLowerCase()
+            .includes(filterInputs[index].value.toLowerCase())
+        ) {
+          shouldHideRow = true;
+        }
+      });
+
+      if (shouldHideRow) {
+        row.style.display = "none";
+      } else {
+        row.style.display = "";
+      }
+    });
+  }
+
+  // Sort table
+
+  let currentSortColumn = null;
+  let currentSortDirection = 1; // 1 for ascending, -1 for descending
+
+  document.querySelectorAll(".sortable").forEach((header, index) => {
+    header.addEventListener("click", () => {
+      sortTable(index);
+    });
+  });
+
+  function sortTable(columnIndex) {
+    // If we click the column that's already being sorted, reverse the direction.
+    if (currentSortColumn === columnIndex) {
+      currentSortDirection *= -1;
+    } else {
+      currentSortDirection = 1;
+      currentSortColumn = columnIndex;
+    }
+
+    const sortedRows = Array.from(rows).sort((rowA, rowB) => {
+      let cellA = rowA.querySelectorAll("td")[columnIndex].textContent.trim();
+      let cellB = rowB.querySelectorAll("td")[columnIndex].textContent.trim();
+
+      // Detect if the column contains numbers
+      const valueA = parseFloat(cellA);
+      const valueB = parseFloat(cellB);
+
+      if (!isNaN(valueA) && !isNaN(valueB)) {
+        // Compare numbers
+        return (valueA - valueB) * currentSortDirection;
+      } else {
+        // Compare strings
+        return cellA.localeCompare(cellB) * currentSortDirection;
+      }
+    });
+
+    // Clear out the current rows in the table body
+    const tbody = document.querySelector(".workload-table tbody");
+    tbody.innerHTML = "";
+
+    // Append the sorted rows
+    sortedRows.forEach((row) => {
+      tbody.appendChild(row);
+    });
+  }
+
+  // Export CSV
+  const exportButton = document.querySelector(".export-button");
+
+  exportButton.addEventListener("click", () => {
+    exportToCSV();
+  });
+
+  function exportToCSV() {
+    // Only export the rows that are visible
+    const filteredRows = Array.from(rows).filter(
+      (row) => row.style.display !== "none"
+    );
+    const csvContent =
+      // for downloading csv file
+      "data:text/csv;charset=utf-8," +
+      encodeURI(generateCSVContent(filteredRows));
+
+    const link = document.createElement("a");
+    link.href = csvContent;
+    link.download = "filtered_data.csv";
+    link.click();
+  }
+
+  // Generate CSV content from the rows
+  function generateCSVContent(rows) {
+    const headers = Array.from(
+      document.querySelectorAll(".workload-table th")
+    ).map((header) => header.textContent.trim());
+    const rowsContent = rows.map((row) =>
+      Array.from(row.querySelectorAll("td"))
+        .map((cell) => cell.textContent.trim())
+        .join(",")
+    );
+
+    return [headers.join(","), ...rowsContent].join("\n");
+  }
+</script>
+{% endblock %}
