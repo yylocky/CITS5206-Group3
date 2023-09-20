@@ -6,33 +6,79 @@ body {
 }
 
 header {
-  background-color: rgb(40,52,139);
-  padding: 10px;
+  height: 100px;
+  background-color: rgb(40, 52, 139);
+  padding: 0 3px;
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Distribute the space between logo and nav links */
 }
 
-/* Style for the logo image */
+/* Reset the default padding and margin on the ul or body elements from either the browser's default styles or from Bootstrap's styles */
+body,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  width: 98%;
+}
+
 .logo {
-  width: 100%;
-  max-width: 150px;
-  height: auto;
-  margin-right: 10px;
+  max-width: 180px;
 }
 
 nav ul {
-  list-style-type: none;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
 }
 
 nav ul li {
-  margin: 0 20px;
+  margin: 0 10px;
+  align-items: center; /* Align UWA logo with other elements in the nav bar */
+  display: flex;
 }
 
 nav ul li a {
+  font-size: 19px;
   text-decoration: none;
   color: white;
+  padding: 10px 10px; /* Add padding for hover effect */
+  border-radius: 5px; /* Rounded corners for hover effect */
+  transition: background-color 0.2s; /* Smooth transition for hover effect */
+}
+
+nav ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Light hover effect */
+  color: white;
+  transition: background-color 0.3s;
+}
+
+/* last-child = login/logout button */
+nav ul li:last-child {
+  margin-left: auto;
+  width: 80px;
+  justify-content: flex-end;
+}
+
+nav ul li:last-child a {
+  background-color: white;
+  color: rgb(40, 52, 139);
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+nav ul li:last-child a:hover {
+  background-color: rgb(40, 100, 400);
+  color: white;
+}
+
+/* Nav link effects for active page */
+nav ul li a.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 3px solid white;
 }
 
 .flashes {
@@ -45,12 +91,14 @@ nav ul li a {
   background-color: #ffc107;
   padding: 10px;
   border-radius: 5px;
+  position: relative;
+  z-index: 2; /* Ensure the flash messages are on top of the background video */
 }
 
 footer {
   text-align: center;
-  margin-top: 20px;
-  padding: 10px;
+  margin-top: 0px;
+  padding: 5px;
   background-color: #f7f7f7;
 }
 
@@ -58,4 +106,30 @@ footer {
   font-size: 14px;
 }
 
-/* Additional styles can be added as needed */
+.notification-alert {
+  display: none; /* The alert is only displayed if there is any Unread comments in the work_allocation table AND the dept_id of the commenter equals to that of the current HoD user */
+  background-color: #ffcc00;
+  padding: 18px 4px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  width: 160px;
+  height: 25px;
+  text-align: center;
+  margin-left: auto; /* Place the alert just between the last nav link and the login/logout button */
+  overflow: hidden;
+}
+
+.notification-alert .btn-close {
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  border: 0;
+  opacity: 10;
+  font-size: 2rem; /* Size of the cross */
+}
+
+.notification-alert .btn-close:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
