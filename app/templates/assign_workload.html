@@ -91,30 +91,24 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
                 <small class="form-text text-danger" style="display: none"
                   >Invalid input</small
             >
+          </div> 
+          <div class="col d-flex align-items-end">
+            <button  type="submit" class="btn btn-primary me-2">Assign</button>
           </div>
-            <div class="col">
-                <label for="submit" class="form-label"></label>
-               <button type="submit" class="btn btn-primary me-2">Assign</button>
-            </div>
          </div>
 
   </form>
-      <button
-      class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
-      onclick="addAssignmentRow()"
-    >
-      Add Assignment
-    </button>
+    
   </div>
 
   <!-- File Upload Section -->
   <h3 class="mt-5">File Upload [HoS / HoDs / Admin]</h3>
   <div class="uploadContainer">
     <div class="row mt-2 uploadRow">
-      <div class="col-2">
-        <label class="form-label">Spreadsheet No.</label>
-        Spreadsheet 1
-      </div>
+
+        
+
+
       <div class="col-4">
         <label for="uploadFile" class="form-label">Upload File</label>
         <input
@@ -131,28 +125,6 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
         <button class="btn btn-primary me-2">Upload</button>
       </div>
     </div>
-    <button
-      class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
-      onclick="addUploadRow()"
-    >
-      Add File
-    </button>
-  </div>
-
-  <!-- Approval of Uploaded Assignment Section -->
-  <h3 class="mt-5">[TBC] Approval of Uploaded Assignment [HoS only]</h3>
-  <div class="approvalContainer">
-    {% for spreadsheet in ["Spreadsheet 1", "Spreadsheet 2", "Spreadsheet 3"] %}
-    <div class="row mt-2 approvalRow">
-      <div class="col-2">{{ spreadsheet }}</div>
-      <div class="col-1">
-        <button class="btn btn-primary">Download</button>
-      </div>
-      <div class="col">
-        <button class="btn btn-success">Approve</button>
-      </div>
-    </div>
-    {% endfor %}
   </div>
 </div>
 
@@ -198,7 +170,7 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
                     if (response.hasOwnProperty("contract_hour")) {
                         var contractHour = parseFloat(response.contract_hour);
                         var assignedHour = parseFloat(inputText2);
-                        document.getElementById("workPoint").textContent = assignedHour / contractHour;
+                        document.getElementById("workPoint").value = assignedHour / contractHour;
 
                     } else {
                         {#var errorDiv = document.getElementById("errorDiv");#}

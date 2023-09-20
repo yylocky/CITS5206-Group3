@@ -1,14 +1,15 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login
+from app.models import Login, User, Role
+
 from app.models import WorkloadAllocation
-from app.models import User,Department,Role,Work
+from app.models import Department,Work
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
-import pandas as pd
 import re
 import random
+from flask import session
 
 # decorator for login page
 
@@ -28,6 +29,7 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('login')
+        set_session(user)
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -41,7 +43,7 @@ def logout():
 @app.route('/view_workload')
 @login_required
 def view_workload():
-    # users=User.query.all() # Just using user table for mockup 
+    # users=User.query.all() # Just using user table for mockup
     return render_template('view_workload.html', title='View Workload')#, users=users)
 
 
@@ -53,7 +55,24 @@ def assign():
 @app.route('/edit_allocation_detail')
 @login_required
 def edit_allocation_detail():
-    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
+    role_name = get_session()
+    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name)
+
+
+def set_session(user):
+    user_info = User.query.filter_by(username=user.username).first()
+    if user_info is None:
+        flash('Invalid Username or Password')
+        return redirect(url_for('login'))
+    role = Role.query.filter_by(role_id=user_info.role_id).first()
+    session['role_id'] = role.role_id
+    session['role_name'] = role.role_name
+
+
+def get_session():
+    role_name = session.get('role_name', '')
+    return role_name
+
 
 @app.route('/dashboard')
 @login_required
@@ -63,10 +82,10 @@ def dashboard():
 
 @app.route("/getpoint", methods=["POST"])
 def get_point():
-    staff_id = request.form.get("staffId")  # 获取 staffId 参数的值
+    staff_id = request.form.get("staffId")  
 
-    # 使用 staff_id 进行筛选
-    user = User.query.filter_by(username=staff_id).first()  # 获取匹配的第一个用户
+    
+    user = User.query.filter_by(username=staff_id).first() 
 
     if user:
         contract_hour = user.contract_hour
@@ -125,7 +144,7 @@ def assign_task():
         k_workload_allocation = WorkloadAllocation(
             work_id=int(k_work_id),
             hours_allocated=float(k_hours_allocated),
-            username=k_username,
+            username=int(k_username),
             comment=k_comment,
             comment_status=k_comment_status,
             workload_point=float(k_workload_point)
@@ -138,7 +157,7 @@ def assign_task():
         # #work
         k_work_explanation="Some explanation for " + k_taskType
         k_work = Work(
-            work_id=k_work_id,
+            work_id=int(k_work_id),
             work_explanation=k_work_explanation,
             work_type=k_taskType,
             dept_id=int(k_dept_id),
@@ -152,7 +171,7 @@ def assign_task():
         k_contract_hour = float(k_workload_point) / float(k_hours_allocated)
 
         k_user=User(
-            username=k_username,
+            username=int(k_username),
             role_id=int(k_role_id),
             leave_hours=float(0),
             contract_hour=float(k_contract_hour),
