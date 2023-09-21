@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login, User, Role, Work, WorkloadAllocation
+from app.models import Login, User, Role, Work, WorkloadAllocation, Department
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
 import re
@@ -82,8 +82,142 @@ def edit_allocation_detail():
         flash('Comment Success')
         return redirect("/edit_allocation_detail")
 
-    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name)
+    workloads = None
+    role_id = session.get('role_id', '')
+    username = session.get('username', '')
+    user = User.query.filter_by(username=username,role_id=role_id).first()
+    # if current user is admin(4) or hod(1), show all workload
+    if role_id == 4 or role_id == 1:
+        workloads = WorkloadAllocation.query.all()
 
+    # if current user is HoD(2), show only their department workload
+    elif role_id == 2:
+        workloads = WorkloadAllocation.query.join(Work, Work.work_id == WorkloadAllocation.work_id).filter(
+            Work.dept_id == user.dept_id).all()
+
+    # if current user is staff(3), show only their workload
+    elif role_id == 3:
+        workloads = WorkloadAllocation.query.filter_by(username=username).all()
+
+    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name,
+                           workloads=workloads, user=user)
+
+
+@app.route('/get_work_type', methods=['GET', 'POST'])
+@login_required
+def get_work_type():
+    work_type = []
+    work_category = request.form.get('work_category')
+    if work_category == "Service":
+        work_type = ["ADMIN", "GA", "SDS"]
+
+    if work_category == "Teaching":
+        work_type = ["CWS", "TEACH", "UDEV"]
+
+    if work_category == "Research":
+        work_type = ["HDR", "ORES", "RES-MGMT", "RESERV"]
+
+    if work_category == "Leave":
+        work_type = ["LSL", "PL", "SBL"]
+
+    return work_type
+
+
+@app.route('/get_work', methods=['GET', 'POST'])
+@login_required
+def get_work():
+    work_id = request.form.get('work_id')
+    work = Work.query.filter_by(work_id=work_id).first()
+    rest = {
+        'work_id': work_id,
+        'dept_id': work.dept_id,
+        'work_explanation': work.work_explanation,
+        'work_type': work.work_type,
+        'unit_code': work.unit_code
+    }
+    return rest
+
+
+@app.route('/get_works', methods=['GET', 'POST'])
+@login_required
+def get_works():
+    works = Work.query.all()
+    rest = []
+    for item in works:
+        temp = {
+            'work_id': item.work_id,
+            'dept_id': item.dept_id,
+            'work_explanation': item.work_explanation,
+            'work_type': item.work_type,
+            'unit_code': item.unit_code
+        }
+        rest.append(temp)
+
+    return rest
+
+
+@app.route('/get_department', methods=['GET', 'POST'])
+@login_required
+def get_department():
+    departments = Department.query.all()
+    rest = []
+    for item in departments:
+        temp = {
+            'dept_id': item.dept_id,
+            'dept_name': item.dept_name
+        }
+        rest.append(temp)
+    return rest
+
+
+@app.route('/get_user', methods=['GET', 'POST'])
+@login_required
+def get_user():
+    users = User.query.all()
+    rest = []
+    for item in users:
+        temp = {
+            'username': item.username,
+            'role_id': item.role_id,
+            'leave_hours': item.leave_hours,
+            'contract_hour': item.contract_hour,
+            'available_hours': item.available_hours,
+            'dept_id': item.dept_id,
+        }
+        rest.append(temp)
+    return rest
+
+
+@app.route('/set_workload_allocation', methods=['GET', 'POST'])
+@login_required
+def set_workload_allocation():
+    alloc_id = request.form.get('alloc_id')
+    work_id = request.form.get('work_id')
+    work_type = request.form.get('work_type')
+    department = request.form.get('department')
+    work_explanation = request.form.get('work_explanation')
+    unit_code = request.form.get('unit_code')
+    hours_allocated = request.form.get('hours_allocated')
+    username = request.form.get('username')
+    workload_point = request.form.get('workload_point')
+
+    workload = WorkloadAllocation.query.filter_by(alloc_id=alloc_id).first()
+
+    workload.work_id = work_id
+    workload.hours_allocated = hours_allocated
+    workload.username = username
+    workload.workload_point = workload_point
+
+    work = Work.query.filter_by(work_id=work_id).first()
+    work.work_type = work_type
+    work.dept_id = department
+    work.work_explanation = work_explanation
+    work.unit_code = unit_code
+
+    db.session.commit()
+
+    rest = {'code': 1, 'msg': 'Modify Success'}
+    return rest
 
 
 def set_session(user):
