@@ -28,6 +28,7 @@ class User(db.Model):
 class Login(UserMixin, db.Model):
     username = db.Column(db.Integer, primary_key=True) # username is the unique staff number
     password_hash = db.Column(db.String(128), nullable=False)
+    user = db.relationship('User', backref='login', uselist=False)
 
     def get_id(self):
         return (self.username)

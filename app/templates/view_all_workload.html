@@ -29,21 +29,23 @@ block styles %}
         <i class="fas fa-sign-in-alt"></i>
         <a href="{{ url_for('login') }}">Log In</a>
       </h3>
-      <h3>
-        <i class="fas fa-user-plus"></i>
-        <a href="{{ url_for('signup') }}">Sign Up</a>
-      </h3>
     </div>
     {% endif %}
   </div>
-  <!-- Start of changes made per the latest commit in the branch for Issue 14-->
+
   <div class="workload-table">
+    <!-- filters -->
     <div class="filter-title">
       <p>Filter</p>
       <input
         type="text"
         class="filter-input"
         placeholder="Filter by Category"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Task Type"
       />
       <input
         type="text"
@@ -65,7 +67,19 @@ block styles %}
         class="filter-input"
         placeholder="Filter by Explanation"
       />
-
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Assigned Hours"
+      />
+      <input
+        type="text"
+        class="filter-input"
+        placeholder="Filter by Workload Point"
+      />
+    </div>
+    <div class="filter-title">
+      <!-- export csv -->
       <button class="export-button">
         <i class="fas fa-file-export"></i>
         Export CSV
@@ -75,14 +89,14 @@ block styles %}
     <table>
       <thead>
         <tr>
-          <th>Category</th>
-          <th>Task Type</th>
-          <th>Department</th>
-          <th>Unit Code</th>
-          <th>Staff Number</th>
-          <th>Explanation</th>
-          <th>Assigned Hours</th>
-          <th>Workload Point</th>
+          <th class="sortable">Category <i class="fas fa-sort"></i></th>
+          <th class="sortable">Task Type <i class="fas fa-sort"></i></th>
+          <th class="sortable">Department <i class="fas fa-sort"></i></th>
+          <th class="sortable">Unit Code <i class="fas fa-sort"></i></th>
+          <th class="sortable">Staff Number <i class="fas fa-sort"></i></th>
+          <th class="sortable">Explanation <i class="fas fa-sort"></i></th>
+          <th class="sortable">Assigned Hours <i class="fas fa-sort"></i></th>
+          <th class="sortable">Workload Point <i class="fas fa-sort"></i></th>
         </tr>
       </thead>
 
@@ -91,8 +105,19 @@ block styles %}
         <tr>
           <td>{{ workload.work.work_category }}</td>
           <td>{{ workload.work.work_type }}</td>
-          <!-- add if condition depends on the worktype -->
-          <td>{{ workload.user.department.dept_name }}</td>
+          <!-- if work type is LSL, PL, SBL, then department is user's department, 
+                else department is work's department -->
+          <td>
+              {% if workload.work.work_type in ['LSL', 'PL', 'SBL'] %}
+              {{workload.user.department.dept_name }}
+              {% else %}
+              {{workload.work.department.dept_name }}
+              {% endif %}
+          </td>
+          
+          </td>
+          
+          </td>
           <td>{{ workload.work.unit_code }}</td>
           <td>{{ workload.user.username }}</td>
           <td>{{ workload.work.work_explanation }}</td>
@@ -100,26 +125,8 @@ block styles %}
           <td>{{ workload.workload_point }}</td>
         </tr>
         {% endfor %}
-        <!-- End of changes made per the latest commit in the branch for Issue 14-->
       </tbody>
     </table>
-    <!-- <table>
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for user in users %}
-        <tr>
-          <td>{{ user.username}}</td>
-          <td>{{ user.email }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table> -->
   </div>
 </div>
 
@@ -129,10 +136,11 @@ block styles %}
   const rows = document.querySelectorAll(".workload-table tbody tr");
 
   filterInputs.forEach((input) => {
+    // Filter table when user types in the input
     input.addEventListener("input", () => {
       applyFilter();
     });
-
+    // Filter table when user presses enter
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         applyFilter();
@@ -146,6 +154,8 @@ block styles %}
       let shouldHideRow = false;
 
       Array.from(columns).forEach((column, index) => {
+        // Case insensitive matching
+        // If the column doesn't contain the input, hide the row
         if (
           !column.innerText
             .toLowerCase()
@@ -163,6 +173,53 @@ block styles %}
     });
   }
 
+  // Sort table
+
+  let currentSortColumn = null;
+  let currentSortDirection = 1; // 1 for ascending, -1 for descending
+
+  document.querySelectorAll(".sortable").forEach((header, index) => {
+    header.addEventListener("click", () => {
+      sortTable(index);
+    });
+  });
+
+  function sortTable(columnIndex) {
+    // If we click the column that's already being sorted, reverse the direction.
+    if (currentSortColumn === columnIndex) {
+      currentSortDirection *= -1;
+    } else {
+      currentSortDirection = 1;
+      currentSortColumn = columnIndex;
+    }
+
+    const sortedRows = Array.from(rows).sort((rowA, rowB) => {
+      let cellA = rowA.querySelectorAll("td")[columnIndex].textContent.trim();
+      let cellB = rowB.querySelectorAll("td")[columnIndex].textContent.trim();
+
+      // Detect if the column contains numbers
+      const valueA = parseFloat(cellA);
+      const valueB = parseFloat(cellB);
+
+      if (!isNaN(valueA) && !isNaN(valueB)) {
+        // Compare numbers
+        return (valueA - valueB) * currentSortDirection;
+      } else {
+        // Compare strings
+        return cellA.localeCompare(cellB) * currentSortDirection;
+      }
+    });
+
+    // Clear out the current rows in the table body
+    const tbody = document.querySelector(".workload-table tbody");
+    tbody.innerHTML = "";
+
+    // Append the sorted rows
+    sortedRows.forEach((row) => {
+      tbody.appendChild(row);
+    });
+  }
+
   // Export CSV
   const exportButton = document.querySelector(".export-button");
 
@@ -171,10 +228,12 @@ block styles %}
   });
 
   function exportToCSV() {
+    // Only export the rows that are visible
     const filteredRows = Array.from(rows).filter(
       (row) => row.style.display !== "none"
     );
     const csvContent =
+      // for downloading csv file
       "data:text/csv;charset=utf-8," +
       encodeURI(generateCSVContent(filteredRows));
 
@@ -184,13 +243,14 @@ block styles %}
     link.click();
   }
 
+  // Generate CSV content from the rows
   function generateCSVContent(rows) {
     const headers = Array.from(
       document.querySelectorAll(".workload-table th")
-    ).map((header) => header.textContent);
+    ).map((header) => header.textContent.trim());
     const rowsContent = rows.map((row) =>
       Array.from(row.querySelectorAll("td"))
-        .map((cell) => cell.textContent)
+        .map((cell) => cell.textContent.trim())
         .join(",")
     );
 
