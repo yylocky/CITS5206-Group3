@@ -136,10 +136,10 @@ body {
     margin-top: 20px;
   }
 
- /* 修改 "upload" 按钮的颜色 */
+ /* change "upload" button color */
 .uploadRow button {
-  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
-  color: white; /* 新的文字颜色 */
+  background-color: rgb(40, 52, 139); /* new background color */
+  color: white; /* new word color */
   border: none;
 }
 
@@ -147,10 +147,10 @@ body {
   background-color: rgb(40, 52, 139);
 }
 
-/* 修改 "download" 按钮的颜色 */
+/* change "download" button color */
 .downloadRow button {
-  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
-  color: white; /* 新的文字颜色 */
+  background-color: rgb(40, 52, 139); /* new background color */
+  color: white; /* new word color */
   border: none;
 }
 
@@ -158,10 +158,10 @@ body {
   background-color: rgb(40, 52, 139);
 }
 
-/* 修改 "assign" 按钮的颜色 */
+/* change "assign" button color */
 .assignmentRow button {
-  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
-  color: white; /* 新的文字颜色 */
+  background-color: rgb(40, 52, 139); /* new background color */
+  color: white; /* new word color */
   border: none;
 }
 
