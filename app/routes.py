@@ -2,14 +2,13 @@ from flask import render_template, request, redirect, url_for, flash, jsonify, c
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
 from app.models import Login, User, WorkloadAllocation, Role, Work
-from app.models import Department
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
 import re
 import random
 from flask import g
 from flask import session
-
+from app.models import Department
 # decorator for login page
 
 
