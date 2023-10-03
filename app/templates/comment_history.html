@@ -80,7 +80,21 @@ block styles %}
         <!-- comments variable defined in routes.py -->
         <tr>
           <td>{{ comment.username }}</td>
-          <td>{{ comment.comment }}</td>
+          <td>
+            <span class="comment-text">
+              <!-- Display up to 50 characters under the Comment column -->
+              {{ comment.comment[:50] }}{% if comment.comment|length > 50
+              %}...{% endif %}
+            </span>
+            <!-- Button for triggering a modal pop-up to display full comment contents -->
+            <button
+              class="read-details-btn"
+              data-comment="{{ comment.comment }}"
+              data-alloc-id="{{ comment.alloc_id }}"
+            >
+              Read Details
+            </button>
+          </td>
           <td>{{ comment.comment_status }}</td>
           <!-- View Workload button - redirecting HoD users to the View Workload page for viewing the workload entry corresponding to a particular comment -->
           <td>
@@ -201,6 +215,73 @@ block styles %}
           error
         );
       });
+  });
+
+  // Function to update comment status in the database
+  function updateCommentStatus(alloc_id, callback) {
+    // Use the fetch API to make a POST request to the update_comment_status route
+    fetch(`/update_comment_status/${alloc_id}`, {
+      method: "POST",
+    })
+      .then((response) => {
+        // Parse the response body as JSON
+        return response.json();
+      })
+      .then((data) => {
+        // If the server responds with either "success" or "alreadyRead", call the callback function without an error
+        if (data.status === "success" || data.status === "alreadyRead") {
+          callback(null);
+        } else {
+          // If there's a different status, call the callback function with an error message
+          callback("Failed to update comment status.");
+        }
+      })
+      .catch((error) => {
+        // If there is an error in the fetch operation, call the callback function with the error
+        callback(error);
+      });
+  }
+
+  // Event listener for Read Details buttons
+  document.querySelectorAll(".read-details-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const commentText = this.getAttribute("data-comment");
+      const alloc_id = this.getAttribute("data-alloc-id");
+
+      // Populate a modal (pop-up window) with full comment contents and handle the "Read & Close" button functionality (close modal and update comment_status)
+      const modal = document.createElement("div");
+      modal.innerHTML = `
+              <div class="modal-content">
+                  <div class="modal-header">Comment Details</div>
+                  <div class="modal-body">${commentText}</div>
+                  <div class="modal-footer">
+                      <button class="read-close-btn">Read & Close</button>
+                  </div>
+              </div>
+          `;
+      modal.classList.add("modal");
+      document.body.appendChild(modal);
+
+      // Close button functionality
+      modal
+        .querySelector(".read-close-btn")
+        .addEventListener("click", function () {
+          updateCommentStatus(alloc_id, (error) => {
+            // If there is an error, log it, but still close the modal.
+            if (error) {
+              console.error(error);
+            }
+            modal.remove();
+          });
+        });
+
+      // Close the modal when clicking outside of it
+      modal.addEventListener("click", function (event) {
+        if (event.target === modal) {
+          modal.remove();
+        }
+      });
+    });
   });
 </script>
 {% endblock %}
