@@ -248,6 +248,9 @@ block styles %}
       const commentText = this.getAttribute("data-comment");
       const alloc_id = this.getAttribute("data-alloc-id");
 
+      // Reference to the current button's parent row (for displaying updated comment status)
+      const currentRow = this.closest("tr");
+
       // Populate a modal (pop-up window) with full comment contents and handle the "Read & Close" button functionality (close modal and update comment_status)
       const modal = document.createElement("div");
       modal.innerHTML = `
@@ -262,7 +265,7 @@ block styles %}
       modal.classList.add("modal");
       document.body.appendChild(modal);
 
-      // Close button functionality
+      // Close the modal and display updated comment status after clicking the Read & Close button
       modal
         .querySelector(".read-close-btn")
         .addEventListener("click", function () {
@@ -270,7 +273,11 @@ block styles %}
             // If there is an error, log it, but still close the modal.
             if (error) {
               console.error(error);
+            } else {
+              // Display the updated comment status
+              currentRow.querySelector("td:nth-child(3)").textContent = "Read";
             }
+            // Close the modal
             modal.remove();
           });
         });

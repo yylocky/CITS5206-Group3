@@ -88,6 +88,10 @@ th {
   cursor: pointer;
 }
 
+.view-button:hover {
+  background-color: rgb(40, 100, 400);
+}
+
 /* For D3 enhancement features */
 
 /* Comment column */
@@ -100,6 +104,12 @@ th {
   vertical-align: middle;
 }
 
+/* Cell under the Comment column */
+.comment-list td:nth-child(2) {
+  position: relative;
+  padding-right: 90px; /* Accommodate the button and prevent text overlap */
+}
+
 /* Read Details button */
 .read-details-btn {
   background-color: rgb(40, 52, 139);
@@ -109,6 +119,10 @@ th {
   padding: 6px 14px;
   cursor: pointer;
   vertical-align: middle;
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%); /* Center vertically */
 }
 
 .read-details-btn:hover {
@@ -149,11 +163,10 @@ th {
 
 .modal-body {
   word-wrap: break-word;
-  max-width: 50ch;
 }
 
 .modal-content {
-  width: 50%;
+  width: 40%;
 }
 
 /* Read & Close button in Modal */
