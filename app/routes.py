@@ -118,7 +118,7 @@ def upload_file():
         data = sheet.values
         data = list(data)
         headings = data[0] # Assuming the headings are in the first row
-        expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'Explanation')
+        expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'leave_hours')
 
         if expected_headings != headings:
             # return "This may not be the right spreadsheet as it does not pass the content validation."
@@ -154,25 +154,26 @@ def upload_file():
                     k_comment_status = 'Unread'
                     k_taskType = row["Task Type"]
                     k_unit_code = row["UnitCode"]
+                    k_leave_hours = row['leave_hours']
 
                     explanation = ""
 
                     department_name = row["Department"]
-                    k_depart = Department.query.filter_by(dept_name=department_name).first()
-                    if k_depart:
-                        k_dept_id = k_depart.dept_id+1
-                    else:
-                        k_dept_id = random.randint(1,10000)
+                    k_dept_id = Department.query.filter_by(dept_name=department_name).first().dept_id
+                    
                     
                     role_name = row["Role"]
-                    k_role = Role.query.filter_by(role_name=role_name).first()
-                
-                    if k_role:
-                        k_role_id = k_role.role_id+1
+                    k_role_id = Role.query.filter_by(role_name=role_name).first().role_id
+
+                    uu = User.query.filter_by(username=k_username).first()
+                    k_workload_point = 1
+                    if not uu or uu.contract_hour==0:
+                        k_workload_point = 1.0
                     else:
-                        k_role_id = random.randint(1,10000)
+                        k_contract_hour = uu.contract_hour
+                        k_workload_point = float(k_hours_allocated/k_contract_hour)
 
-
+                    k_work_id = Work.query.count() + 1
                     # #workload
                     k_workload_allocation = WorkloadAllocation(
                         work_id=str(k_work_id),
@@ -180,7 +181,7 @@ def upload_file():
                         username=str(k_username),
                         comment=k_comment,
                         comment_status=k_comment_status,
-                        workload_point=float(k_workload_point)
+                        workload_point= k_workload_point
                     )
 
                     db.session.add(k_workload_allocation)
@@ -192,33 +193,33 @@ def upload_file():
                     # #work
                     # k_work_explanation = "Some explanation for " + k_taskType
                     if k_taskType == 'ADMIN':
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'CWS':
-                        explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
                     if k_taskType == "GA":
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'HDR':
-                        explanation = "HDR sup of" + k_work_id
+                        explanation = "HDR sup of " + k_work_id
                     if k_taskType == 'NEMP':
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'CWS':
-                        explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
                     if k_taskType == 'RESERV':
-                        explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
                     if k_taskType == 'RES - MGMT':
-                        explanation = "cwk proj sup of" + k_work_id + "in" + k_unit_code
+                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
                     if k_taskType == 'SDS':
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'TEACH':
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'UDEV':
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'LSL':
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'PL':
                         explanation = role_name + "in" + k_unit_code
                     if k_taskType == 'SBL':
-                        explanation = role_name + "in" + k_unit_code
+                        explanation = role_name + " in " + k_unit_code
 
                     k_work = Work(
                         # work_id=k_work_id,
@@ -233,20 +234,26 @@ def upload_file():
 
                     # user
 
+                    uu = User.query.filter_by(username=k_username).first()
+                    if not uu:
+                        k_user = User(
+                            # username=random.randint(0, 100000),
+                            username = k_username,
+                            role_id=k_role_id,
+                            # alloc_id=random.randint(0, 120),
+                            leave_hours=k_leave_hours,
+                            dept_id=k_dept_id
+                        )
 
-                    k_user = User(
-                        # username=random.randint(0, 100000),
-                        username = k_username,
-                        role_id=k_role_id,
-                        # alloc_id=random.randint(0, 120),
-                        leave_hours=float(0),
-                        contract_hour=0,
-                        available_hours=0,
-                        dept_id=k_dept_id
-                    )
+                        db.session.add(k_user)
+                        db.session.commit()
+                    else:
+                        user = User.query.filter_by(username=k_username).first()
+                        user.role_id = k_role_id
+                        user.leave_hours=k_leave_hours
+                        user.dept_id = k_dept_id
 
-                    db.session.add(k_user)
-                    db.session.commit()
+                        db.session.commit()
 
                     
 
