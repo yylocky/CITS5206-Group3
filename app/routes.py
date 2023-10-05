@@ -115,12 +115,14 @@ def upload_file():
         #validate the spreadsheet
         workbook = load_workbook(file)
         sheet = workbook.active
-        data = sheet.values
-        data = list(data)
-        headings = data[0] # Assuming the headings are in the first row
-        expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'leave_hours')
+        sheet_title = sheet.title
+        print(sheet_title) #testing
+        #data = sheet.values
+        #data = list(data)
+        #headings = data[0] # Assuming the headings are in the first row
+        #expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'leave_hours')
 
-        if expected_headings != headings:
+        if sheet_title != "UWA_WLAM":
             # return "This may not be the right spreadsheet as it does not pass the content validation."
             flash('Invalid spreedsheet, please upload again') # MW
             return redirect(url_for('assign')) #mw
