@@ -10,6 +10,7 @@ from werkzeug.urls import url_parse
 import re
 import random
 from flask import session
+import uuid
 
 # decorator for login page
 
@@ -140,9 +141,21 @@ def assign_task():
         k_role_id = k_role.role_id
         print(k_role_id)
 
+        # #work
+        k_work_explanation="Some explanation for " + k_taskType
+        k_work = Work(
+            work_explanation=k_comment,
+            work_type=k_taskType,
+            dept_id=int(k_dept_id),
+            unit_code=k_unit_code
+        )
+        #
+        db.session.add(k_work)
+        db.session.commit()
+
         # #workload
         k_workload_allocation = WorkloadAllocation(
-            work_id=int(k_work_id),
+            work_id=k_work.work_id,
             hours_allocated=float(k_hours_allocated),
             username=int(k_username),
             comment=k_comment,
@@ -154,31 +167,10 @@ def assign_task():
         db.session.commit()
         #
 
-        # #work
-        k_work_explanation="Some explanation for " + k_taskType
-        k_work = Work(
-            work_id=int(k_work_id),
-            work_explanation=k_work_explanation,
-            work_type=k_taskType,
-            dept_id=int(k_dept_id),
-            unit_code=k_unit_code
-        )
-        #
-        db.session.add(k_work)
-        db.session.commit()
-
         #user
         k_contract_hour = float(k_workload_point) / float(k_hours_allocated)
-
-        k_user=User(
-            username=int(k_username),
-            role_id=int(k_role_id),
-            leave_hours=float(0),
-            contract_hour=float(k_contract_hour),
-            available_hours=float(k_contract_hour),
-            dept_id=int(k_dept_id)
-        )
-
+        k_user = User.query.filter_by(username=k_username).first()
+        k_user.leave_hours = k_hours_allocated
         db.session.add(k_user)
         db.session.commit()
 
@@ -186,6 +178,44 @@ def assign_task():
     except Exception as e:
         return f"Error: {str(e)}"
 
+def generate_int_id():
+    # Generate a UUID4 and convert it to an integer
+    uuid_str = str(uuid.uuid4()).replace('-', '')
+    int_id = int(uuid_str, 16)
+    int_id = int(str(int_id)[0:12])
+    return int_id
+@app.route("/get_department", methods=["POST"])
+def get_department():
+    staff_id = request.form.get("staffId")
+    user_info = User.query.filter_by(username=staff_id).first()
+    dept_info = Department.query.filter_by(dept_id=user_info.dept_id).first()
+    # Assuming you have retrieved the department as "department_name"
+    department_name = dept_info.dept_name # Replace with your actual department retrieval logic
+    return jsonify({"department": department_name})
+
+
+@app.route('/check_duplicate_task', methods=['POST'])
+def check_duplicate_task():
+    try:
+        task_type = request.form.get("taskType")
+        department = request.form.get("department")
+        staff_id = request.form.get("staffId")
+        assigned_hours = request.form.get("assignedHours")
+        k_workload_point = request.form.get("workPoint")
+
+        is_duplicate = False
+
+        workloads = WorkloadAllocation.query.filter_by(username= staff_id, hours_allocated=assigned_hours, workload_point= k_workload_point).all()
+        for item in workloads:
+            k_depart = Department.query.filter_by(dept_name=department).first()
+            works = Work.query.filter_by(work_id=item.work_id, work_type=task_type, dept_id=k_depart.dept_id).all()
+            if len(works) != 0:
+                is_duplicate = True
+                break
+        print(is_duplicate)
+        return jsonify({"is_duplicate": is_duplicate})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 
 

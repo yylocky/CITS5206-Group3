@@ -4,8 +4,8 @@ block content %}
   rel="stylesheet"
   href="{{ url_for('static', filename='css/base.css') }}"
 />
-<link 
-rel="stylesheet" 
+<link
+rel="stylesheet"
 href="{{ url_for('static', filename='css/view_workload.css') }}"
 />
 <div class="container mt-5">
@@ -21,7 +21,7 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
     </div>
 
   <div class="assignmentContainer">
-  <form method="POST" action="/assign">
+  <form id="assignmentForm" method="POST" action="/assign">
     <div class="row mt-2 assignmentRow">
             <div class="col">
             <label for="category" class="form-label">Category</label>
@@ -91,14 +91,15 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
                 <small class="form-text text-danger" style="display: none"
                   >Invalid input</small
             >
-          </div> 
-          <div class="col d-flex align-items-end">
+          </div>
+          <div class="col">
+            <label style="visibility: hidden" for="option" class="form-label">Work Point</label>
             <button  type="submit" class="btn btn-primary me-2">Assign</button>
           </div>
          </div>
 
   </form>
-    
+
   </div>
 
   <!-- File Upload Section -->
@@ -106,7 +107,7 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
   <div class="uploadContainer">
     <div class="row mt-2 uploadRow">
 
-        
+
 
 
       <div class="col-4">
@@ -286,7 +287,7 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
                   >Invalid input</small
             >
           </div>
-            <div class="col d-flex align-items-end">
+            <div class="col">
               <button type="submit" class="btn btn-primary me-2">Assign</button>
               <button class="btn btn-danger me-2" onclick="removeAsgRow(this)">
                 Remove
@@ -347,6 +348,154 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
     let row = btnElement.closest(".row");
     row.remove();
   }
+
+  // Add an event listener to the "category" selection field
+document.getElementById("category").addEventListener("change", function () {
+  var category = this.value;
+  var unitCodeInput = document.getElementById("unitCode");
+
+  if (category === "Leave") {
+    // If the category is "Leave," hide the input field and show "N/A"
+      unitCodeInput.value = 'N/A'
+    unitCodeInput.readOnly = true;
+  } else {
+    // If the category is not "Leave," show the input field and hide "N/A"
+    unitCodeInput.readOnly = false;
+      unitCodeInput.value = ''
+  }
+});
+
+
+  document.getElementById("staffId").addEventListener("change", function () {
+     var category = document.getElementById("category").value
+      if (category !== "Leave") {
+          return
+      }
+          console.log('Leave')
+
+
+  var staffIdInput = this.value;
+
+  if (staffIdInput !== "") {
+    // Send an AJAX request to retrieve the department for the entered staff ID
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/get_department", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+
+        if (response.hasOwnProperty("department")) {
+          // Update the "department" selection field
+          var departmentSelect = document.getElementById("department");
+          departmentSelect.value = response.department;
+        }
+      } else {
+        console.error("Error: " + xhr.status);
+      }
+    };
+
+    var data = "staffId=" + encodeURIComponent(staffIdInput);
+    xhr.send(data);
+  }
+});
+
+  function checkDuplicateTaskAndAssign() {
+  var category = document.getElementById("category").value;
+  var taskType = document.getElementById("taskType").value;
+  var department = document.getElementById("department").value;
+  var staffId = document.getElementById("staffId").value;
+  var explanation = document.getElementById("explanation").value;
+  var unitCode = document.getElementById("unitCode").value;
+  var assignedHours = document.getElementById("assignedHours").value;
+  var workPoint = document.getElementById("workPoint").value;
+
+  // Send an AJAX request to check for duplicate tasks
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/check_duplicate_task", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+
+      if (response.is_duplicate) {
+        // Display a confirmation dialog if a duplicate task is found
+        var confirmAssign = confirm("A task with the same content information already exists. Do you want to continue assigning it?");
+        if (!confirmAssign) {
+          // User canceled the assignment
+          return false;
+        }
+      }
+
+      // If no duplicate or user confirms, proceed with the assignment
+        sendAssignRequest()
+        return true;
+    } else {
+      console.error("Error: " + xhr.status);
+      return false
+    }
+  };
+
+  var data = "category=" + encodeURIComponent(category) +
+             "&taskType=" + encodeURIComponent(taskType) +
+             "&department=" + encodeURIComponent(department) +
+             "&staffId=" + encodeURIComponent(staffId) +
+             "&explanation=" + encodeURIComponent(explanation) +
+             "&unitCode=" + encodeURIComponent(unitCode) +
+             "&assignedHours=" + encodeURIComponent(assignedHours) +
+             "&workPoint=" + encodeURIComponent(workPoint);
+
+  xhr.send(data);
+}
+
+
+document.getElementById("assignmentForm").addEventListener("submit", function (e) {
+  e.preventDefault(); // Prevent the default form submission
+    checkDuplicateTaskAndAssign()
+});
+
+  // Function to send the assignment request and handle the response
+function sendAssignRequest() {
+  var category = document.getElementById("category").value;
+  var taskType = document.getElementById("taskType").value;
+  var department = document.getElementById("department").value;
+  var staffId = document.getElementById("staffId").value;
+  var explanation = document.getElementById("explanation").value;
+  var unitCode = document.getElementById("unitCode").value;
+  var assignedHours = document.getElementById("assignedHours").value;
+  var workPoint = document.getElementById("workPoint").value;
+
+  // Create a data object with the assignment details
+  var data = "category=" + encodeURIComponent(category) +
+             "&taskType=" + encodeURIComponent(taskType) +
+             "&department=" + encodeURIComponent(department) +
+             "&staffId=" + encodeURIComponent(staffId) +
+             "&explanation=" + encodeURIComponent(explanation) +
+             "&unitCode=" + encodeURIComponent(unitCode) +
+             "&assignedHours=" + encodeURIComponent(assignedHours) +
+             "&workPoint=" + encodeURIComponent(workPoint);
+
+  // Send an AJAX request to the /assign endpoint
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/assign", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      // Assignment was successful, show the success modal
+        alert('assign success')
+    } else {
+      console.error("Error: " + xhr.status);
+      // Handle the error (e.g., display an error message)
+        alert('assign error')
+    }
+  };
+
+  // Send the data as a URL-encoded string
+  xhr.send(data);
+}
 </script>
 
 {% endblock %}
