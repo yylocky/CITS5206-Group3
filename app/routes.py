@@ -138,10 +138,9 @@ def upload_file():
                 for index, row in df.iterrows():
                     print(f"Row {index + 1}:")
                     print("Code:", row["Staff ID"])
-                    print("Task Type:", row["Task Type"])
+                    print("Teach Type:", row["Teach tyoe"])
                     print("Title:", row["UnitCode"])
                     print("Dept:", row["Department"])
-
                     print("Comment:", row["Comment"])
                     print("Staff:", row["Role"])
                     print("WkldHours:", row["WorkloadHours"])
@@ -154,9 +153,11 @@ def upload_file():
                     k_workload_point = 0.5
                     k_comment = row["Comment"]
                     k_comment_status = 'Unread'
-                    k_taskType = row["Task Type"]
+                    k_taskType = row["Teach tyoe"]
                     k_unit_code = row["UnitCode"]
                     k_leave_hours = row['leave_hours']
+                    #added by MW on 5 OCt
+                    
 
                     explanation = ""
 
