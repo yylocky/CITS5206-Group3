@@ -38,6 +38,8 @@ def logout():
     return redirect(url_for('login'))
 
 # decorator for filtered view_workload page from notification
+
+
 @app.route('/view_workload')
 @login_required
 def view_workload():
@@ -55,6 +57,8 @@ def view_workload():
     return render_template('view_workload.html', title='View Workload', workloads=workloads)
 
 # decorator for view all workload page
+
+
 @app.route('/view_all_workload')
 @login_required
 def view_all_workload():
@@ -65,13 +69,16 @@ def view_all_workload():
 
     # if current user is HoD(2), show only their department workload
     elif role_id == 2:
-        workloads = WorkloadAllocation.query.join(Work, Work.work_id == WorkloadAllocation.work_id).filter(Work.dept_id == current_user.user.dept_id).all()
+        workloads = WorkloadAllocation.query.join(Work, Work.work_id == WorkloadAllocation.work_id).filter(
+            Work.dept_id == current_user.user.dept_id).all()
 
     # if current user is staff(3), show only their workload
     elif role_id == 3:
-        workloads = WorkloadAllocation.query.filter_by(username=current_user.username).all()
+        workloads = WorkloadAllocation.query.filter_by(
+            username=current_user.username).all()
 
     return render_template('view_all_workload.html', title='View All Workload', workloads=workloads)
+
 
 @app.route('/assign_workload')
 @login_required
@@ -128,18 +135,36 @@ def mark_comments_as_read():
             User.dept_id == hod_dept_id
         ).all()
 
-        # Update the comment_status to "Read" for each fetched comment
-        for comment in comments:
-            if comment.comment_status == "Unread":
-                comment.comment_status = "Read"
-                db.session.commit()
-
         # Return success status as JSON response
         return jsonify(status="success"), 200
 
     # If the user is not an HoD, return an error message
     else:
         return jsonify(status="error", message="Unauthorised access"), 403
+
+# Update comment_status from Unread to Read upon clicking the "Read & Close" button in the modal of the Comment History page
+# The URL of this route has a dynamic part 'alloc_id' which is an integer.
+
+
+@app.route('/update_comment_status/<int:alloc_id>', methods=['POST'])
+@login_required
+def update_comment_status(alloc_id):
+    # Fetch comment from the database using the provided 'alloc_id'
+    comment = WorkloadAllocation.query.get(alloc_id)
+
+    # Check if the comment exists
+    if comment:
+        if comment.comment_status == "Unread":
+            comment.comment_status = "Read"
+            db.session.commit()
+            # Return a success status with a 200 OK HTTP status code
+            return jsonify(status="success"), 200
+        else:
+            # If the comment is already "Read", return a status indicating that it's already read with a 200 OK HTTP status code.
+            return jsonify(status="alreadyRead"), 200
+    # If the comment doesn't exist, return an error status with a 404 Not Found HTTP status code.
+    return jsonify(status="error", message="Comment not found"), 404
+
 
 # The below function runs before processing a request
 
