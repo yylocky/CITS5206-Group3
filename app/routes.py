@@ -138,7 +138,7 @@ def upload_file():
                 for index, row in df.iterrows():
                     print(f"Row {index + 1}:")
                     print("Code:", row["Staff ID"])
-                    print("Teach Type:", row["Teach tyoe"])
+                    print("Teach Type:", row["Teach type"])
                     print("Title:", row["UnitCode"])
                     print("Dept:", row["Department"])
                     print("Comment:", row["Comment"])
@@ -150,6 +150,23 @@ def upload_file():
                     print("Leave days", row["Leave days"])
                     print("RM Hours", row["RM Hours"])
                     print("CWS Hours", row["CWS Hours"])
+
+
+                    #MW 6 Oct - admin
+                    print("adminRole:", row["Type of admin role"])
+                    print("adminHours:", row["Admin Hours"])
+                    print("adminComment:", row["Admin_Comment"])
+                    
+                    #MW 6 Oct - leave
+                    print("leaveType:", row["Type of leave"])
+                    print("leaveDays:", row["workdays"])                   
+     
+                    #MW 6 Oct - RM
+                    print("RMHours", row["RM_Hours"])
+                    print("RMComments:", row["RM_Jusification"])
+
+                    #MW 6 Oct - CWS
+                    print("CWSHours", row["CWS_Hours"])
 
                     print("-" * 20)
 
@@ -163,7 +180,8 @@ def upload_file():
                     #k_comment_status = 'Unread'
                     k_taskType = row["Teach type"]
                     k_unit_code = row["UnitCode"]
-                    k_leave_hours = row["leave_hours"]
+                    k_leave_hours = row['leave_hours']
+                    #added by MW on 5 OCt
                     
 
                     explanation = ""
