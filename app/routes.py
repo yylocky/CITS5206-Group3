@@ -6,6 +6,7 @@ from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
 import re
 import random
+from flask import g
 from flask import session
 import uuid
 
