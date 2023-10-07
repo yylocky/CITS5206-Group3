@@ -144,29 +144,12 @@ def upload_file():
                     print("Comment:", row["Comment"])
                     print("Staff:", row["Role"])
                     print("WkldHours:", row["WkldHours"])
-                    print("Admin Type:", row["Admin Type"])
+                    print("Admin Type of Role:", row["Admin Type of Role"])
                     print("Admin Hours:", row["Admin Hours"])
                     print("Leave Type:", row["Leave Type"])
                     print("Leave days", row["Leave days"])
                     print("RM Hours", row["RM Hours"])
                     print("CWS Hours", row["CWS Hours"])
-
-
-                    #MW 6 Oct - admin
-                    print("adminRole:", row["Type of admin role"])
-                    print("adminHours:", row["Admin Hours"])
-                    print("adminComment:", row["Admin_Comment"])
-                    
-                    #MW 6 Oct - leave
-                    print("leaveType:", row["Type of leave"])
-                    print("leaveDays:", row["workdays"])                   
-     
-                    #MW 6 Oct - RM
-                    print("RMHours", row["RM_Hours"])
-                    print("RMComments:", row["RM_Jusification"])
-
-                    #MW 6 Oct - CWS
-                    print("CWSHours", row["CWS_Hours"])
 
                     print("-" * 20)
 
@@ -180,7 +163,7 @@ def upload_file():
                     #k_comment_status = 'Unread'
                     k_taskType = row["Teach type"]
                     k_unit_code = row["UnitCode"]
-                    k_leave_hours = row['leave_hours']
+                    #k_leave_hours = row['leave_hours']
                     #added by MW on 5 OCt
                     
 
@@ -227,27 +210,21 @@ def upload_file():
                         explanation = "HDR sup of " + k_work_id
                     if k_taskType == 'NEMP':
                         explanation = role_name + " in " + k_unit_code
-                    if k_taskType == 'CWS':
-                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
+                    #if k_taskType == 'CWS':
+                        #explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
                     if k_taskType == 'RESERV':
                         explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
-                    if k_taskType == 'RES - MGMT':
-                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
+                    # if k_taskType == 'RES - MGMT':
+                        #explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
                     if k_taskType == 'SDS':
                         explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'TEACH':
                         explanation = role_name + " in " + k_unit_code
                     if k_taskType == 'UDEV':
                         explanation = role_name + " in " + k_unit_code
-                    if k_taskType == 'LSL':
-                        explanation = role_name + " in " + k_unit_code
-                    if k_taskType == 'PL':
-                        explanation = role_name + "in" + k_unit_code
-                    if k_taskType == 'SBL':
-                        explanation = role_name + " in " + k_unit_code
 
                     k_work = Work(
-                        # work_id=k_work_id,
+                        work_id=k_work_id,
                         work_explanation=explanation,
                         work_type=k_taskType,
                         dept_id=k_dept_id,
@@ -257,36 +234,46 @@ def upload_file():
                     db.session.commit()
 
                     # Admin
-                    #k_work_id = row["Staff ID"]
-                    #k_username = k_work_id
+                    k_work_id = Work.query.count() + 1
+                    k_username = row["Staff ID"]
                     k_hours_allocated = row["Admin Hours"]
-                    #k_workload_point = 0.5
-                    #k_comment = row["Comment"]
-                    #k_comment_status = 'Unread'
-                    k_taskType = row["Admin Type"]
-                    #k_work_id = Work.query.count() + 1
+                    k_taskType = 'ADMIN'
+                    explanation = row["Admin Type of Role"]
 
+                    # Insert allocation record
                     k_workload_allocation = WorkloadAllocation(
                         work_id=str(k_work_id),
                         hours_allocated=float(k_hours_allocated),
                         username=str(k_username),
-                        # comment=k_comment,
-                        # comment_status=k_comment_status,
-                        #workload_point= k_workload_point
                     )
                     db.session.add(k_workload_allocation)
                     db.session.commit()
+
+                    # Insert work record
+                    k_work = Work(
+                        work_id=k_work_id,
+                        work_explanation=explanation,
+                        work_type=k_taskType,
+                        #dept_id=k_dept_id,
+                        #unit_code=k_unit_code
+                    )
+                    db.session.add(k_work)
+                    db.session.commit()                  
 
                     # Leave
-                    #k_work_id = row["Staff ID"]
-                    #k_username = k_work_id
+                    k_work_id = Work.query.count() + 1
+                    k_username = row["Staff ID"]
                     k_hours_allocated = row["Leave days"]
-                    #k_workload_point = 0.5
-                    #k_comment = row["Comment"]
-                    #k_comment_status = 'Unread'
                     k_taskType = row["Leave Type"]
-                    #k_work_id = Work.query.count() + 1
+                    k_leave_hours = float(k_hours_allocated)*7.5
+                    if k_taskType == 'LSL':
+                        explanation = k_username + 'on LSL'
+                    if k_taskType == 'PL':
+                        explanation = k_username + 'on PL'
+                    if k_taskType == 'SBL':
+                        explanation = k_username + 'on SBL'
 
+                    #Admin-insert work allocation record
                     k_workload_allocation = WorkloadAllocation(
                         work_id=str(k_work_id),
                         hours_allocated=float(k_hours_allocated)*7.5,
@@ -297,54 +284,70 @@ def upload_file():
                     )
                     db.session.add(k_workload_allocation)
                     db.session.commit()
+
+                    # Admin - Insert work record
+                    k_work = Work(
+                        work_id=k_work_id,
+                        work_explanation=explanation,
+                        work_type=k_taskType,
+                        #dept_id=k_dept_id,
+                        #unit_code=k_unit_code
+                    )
+                    db.session.add(k_work)
+                    db.session.commit()      
+
 
                     # RM
-                    #k_work_id = row["Staff ID"]
-                    #k_username = k_work_id
-                    k_hours_allocated = row["Leave days"]
-                    #k_workload_point = 0.5
-                    #k_comment = row["Comment"]
-                    #k_comment_status = 'Unread'
-                    k_taskType = "RES - MGMT"
-                    #k_work_id = Work.query.count() + 1
+                    k_work_id = Work.query.count() + 1
+                    k_username = row["Staff ID"]
+                    k_hours_allocated = row["RM Hours"]
+                    k_taskType = 'RES - MGMT'
+                    explanation = "cwk proj sup of " + k_work_id
 
+                    #RM - insert allocation record
                     k_workload_allocation = WorkloadAllocation(
                         work_id=str(k_work_id),
-                        hours_allocated=float(k_hours_allocated)*7.5,
-                        username=str(k_username),
-                        # comment=k_comment,
-                        # comment_status=k_comment_status,
-                        #workload_point= k_workload_point
-                    )
-                    db.session.add(k_workload_allocation)
-                    db.session.commit()
-
-
-                    # CWS
-                    #k_work_id = row["Staff ID"]
-                    #k_username = k_work_id
-                    k_hours_allocated = row["CWS Hours"]
-                    #k_workload_point = 0.5
-                    #k_comment = row["Comment"]
-                    #k_comment_status = 'Unread'
-                    k_taskType = "CWS"
-                    #k_work_id = Work.query.count() + 1
-
-                    k_workload_allocation = WorkloadAllocation(
-                        #work_id=str(k_work_id),
                         hours_allocated=float(k_hours_allocated),
                         username=str(k_username),
-                        # comment=k_comment,
-                        # comment_status=k_comment_status,
-                        #workload_point= k_workload_point
+                    )
+                    db.session.add(k_workload_allocation)
+                    db.session.commit()
+                    
+                    # RM - Insert work record
+                    k_work = Work(
+                        work_id=k_work_id,
+                        work_explanation=explanation,
+                        work_type=k_taskType,
+                    )
+                    db.session.add(k_work)
+                    db.session.commit()  
+
+                    # CWS - definition
+                    k_work_id = Work.query.count() + 1
+                    k_username = row["Staff ID"]
+                    k_hours_allocated = row["CWS Hours"]
+                    k_taskType = "CWS"
+                    explanation = "cwk proj sup of " + k_work_id
+
+                    #CWS - add workallocation record
+                    k_workload_allocation = WorkloadAllocation(
+                        work_id=str(k_work_id),
+                        hours_allocated=float(k_hours_allocated),
+                        username=str(k_username),
                     )
                     db.session.add(k_workload_allocation)
                     db.session.commit()
 
-
+                    # RM - Insert work record
+                    k_work = Work(
+                        work_id=k_work_id,
+                        work_explanation=explanation,
+                        work_type=k_taskType,
+                    )
+                    db.session.add(k_work)
+                    db.session.commit() 
 
                     # user
-
                     uu = User.query.filter_by(username=k_username).first()
                     if not uu:
                         k_user = User(
