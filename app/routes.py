@@ -150,6 +150,7 @@ def upload_file():
                     print("Leave days", row["Leave days"])
                     print("RM Hours", row["RM Hours"])
                     print("CWS Hours", row["CWS Hours"])
+                    print("RM Justification", row["RM Justification"])
 
                     print("-" * 20)
 
@@ -302,7 +303,7 @@ def upload_file():
                     k_username = row["Staff ID"]
                     k_hours_allocated = row["RM Hours"]
                     k_taskType = 'RES - MGMT'
-                    explanation = "cwk proj sup of " + k_work_id
+                    explanation = row["RM Justification"]
 
                     #RM - insert allocation record
                     k_workload_allocation = WorkloadAllocation(
