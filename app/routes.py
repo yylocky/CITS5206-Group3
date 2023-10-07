@@ -124,8 +124,8 @@ def upload_file():
 
         if sheet_title != "UWA_WLAM":
             # return "This may not be the right spreadsheet as it does not pass the content validation."
-            flash('Invalid spreedsheet, please upload again') # MW
-            return redirect(url_for('assign')) #mw
+            flash('Invalid spreedsheet, please upload again')
+            return redirect(url_for('assign'))
         
         else:
             # insert DB
@@ -143,20 +143,27 @@ def upload_file():
                     print("Dept:", row["Department"])
                     print("Comment:", row["Comment"])
                     print("Staff:", row["Role"])
-                    print("WkldHours:", row["WorkloadHours"])
+                    print("WkldHours:", row["WkldHours"])
+                    print("Admin Type:", row["Admin Type"])
+                    print("Admin Hours:", row["Admin Hours"])
+                    print("Leave Type:", row["Leave Type"])
+                    print("Leave days", row["Leave days"])
+                    print("RM Hours", row["RM Hours"])
+                    print("CWS Hours", row["CWS Hours"])
 
                     print("-" * 20)
 
+                    
+                    #Work allocation
                     k_work_id = row["Staff ID"]
                     k_username = k_work_id
                     k_hours_allocated = row["WorkloadHours"]
                     k_workload_point = 0.5
-                    k_comment = row["Comment"]
-                    k_comment_status = 'Unread'
-                    k_taskType = row["Teach tyoe"]
+                    #k_comment = row["Comment"]
+                    #k_comment_status = 'Unread'
+                    k_taskType = row["Teach type"]
                     k_unit_code = row["UnitCode"]
-                    k_leave_hours = row['leave_hours']
-                    #added by MW on 5 OCt
+                    k_leave_hours = row["leave_hours"]
                     
 
                     explanation = ""
@@ -177,21 +184,18 @@ def upload_file():
                         k_workload_point = float(k_hours_allocated/k_contract_hour)
 
                     k_work_id = Work.query.count() + 1
-                    # #workload
+                    # workload
                     k_workload_allocation = WorkloadAllocation(
                         work_id=str(k_work_id),
                         hours_allocated=float(k_hours_allocated),
                         username=str(k_username),
-                        comment=k_comment,
-                        comment_status=k_comment_status,
+                        # comment=k_comment,
+                        # comment_status=k_comment_status,
                         workload_point= k_workload_point
                     )
 
                     db.session.add(k_workload_allocation)
                     db.session.commit()
-
-                    
-                    
 
                     # #work
                     # k_work_explanation = "Some explanation for " + k_taskType
@@ -231,9 +235,95 @@ def upload_file():
                         dept_id=k_dept_id,
                         unit_code=k_unit_code
                     )
-                    #
                     db.session.add(k_work)
                     db.session.commit()
+
+                    # Admin
+                    #k_work_id = row["Staff ID"]
+                    #k_username = k_work_id
+                    k_hours_allocated = row["Admin Hours"]
+                    #k_workload_point = 0.5
+                    #k_comment = row["Comment"]
+                    #k_comment_status = 'Unread'
+                    k_taskType = row["Admin Type"]
+                    #k_work_id = Work.query.count() + 1
+
+                    k_workload_allocation = WorkloadAllocation(
+                        work_id=str(k_work_id),
+                        hours_allocated=float(k_hours_allocated),
+                        username=str(k_username),
+                        # comment=k_comment,
+                        # comment_status=k_comment_status,
+                        #workload_point= k_workload_point
+                    )
+                    db.session.add(k_workload_allocation)
+                    db.session.commit()
+
+                    # Leave
+                    #k_work_id = row["Staff ID"]
+                    #k_username = k_work_id
+                    k_hours_allocated = row["Leave days"]
+                    #k_workload_point = 0.5
+                    #k_comment = row["Comment"]
+                    #k_comment_status = 'Unread'
+                    k_taskType = row["Leave Type"]
+                    #k_work_id = Work.query.count() + 1
+
+                    k_workload_allocation = WorkloadAllocation(
+                        work_id=str(k_work_id),
+                        hours_allocated=float(k_hours_allocated)*7.5,
+                        username=str(k_username),
+                        # comment=k_comment,
+                        # comment_status=k_comment_status,
+                        #workload_point= k_workload_point
+                    )
+                    db.session.add(k_workload_allocation)
+                    db.session.commit()
+
+                    # RM
+                    #k_work_id = row["Staff ID"]
+                    #k_username = k_work_id
+                    k_hours_allocated = row["Leave days"]
+                    #k_workload_point = 0.5
+                    #k_comment = row["Comment"]
+                    #k_comment_status = 'Unread'
+                    k_taskType = "RES - MGMT"
+                    #k_work_id = Work.query.count() + 1
+
+                    k_workload_allocation = WorkloadAllocation(
+                        work_id=str(k_work_id),
+                        hours_allocated=float(k_hours_allocated)*7.5,
+                        username=str(k_username),
+                        # comment=k_comment,
+                        # comment_status=k_comment_status,
+                        #workload_point= k_workload_point
+                    )
+                    db.session.add(k_workload_allocation)
+                    db.session.commit()
+
+
+                    # CWS
+                    #k_work_id = row["Staff ID"]
+                    #k_username = k_work_id
+                    k_hours_allocated = row["CWS Hours"]
+                    #k_workload_point = 0.5
+                    #k_comment = row["Comment"]
+                    #k_comment_status = 'Unread'
+                    k_taskType = "CWS"
+                    #k_work_id = Work.query.count() + 1
+
+                    k_workload_allocation = WorkloadAllocation(
+                        #work_id=str(k_work_id),
+                        hours_allocated=float(k_hours_allocated),
+                        username=str(k_username),
+                        # comment=k_comment,
+                        # comment_status=k_comment_status,
+                        #workload_point= k_workload_point
+                    )
+                    db.session.add(k_workload_allocation)
+                    db.session.commit()
+
+
 
                     # user
 
