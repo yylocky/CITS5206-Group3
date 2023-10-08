@@ -234,6 +234,29 @@ def upload_file():
                     db.session.add(k_work)
                     db.session.commit()
 
+
+                    # user
+                    uu = User.query.filter_by(username=k_username).first()
+                    if not uu:
+                        k_user = User(
+                            # username=random.randint(0, 100000),
+                            username = k_username,
+                            role_id=k_role_id,
+                            # alloc_id=random.randint(0, 120),
+                            leave_hours=k_leave_hours,
+                            dept_id=k_dept_id
+                        )
+
+                        db.session.add(k_user)
+                        db.session.commit()
+                    else:
+                        user = User.query.filter_by(username=k_username).first()
+                        user.role_id = k_role_id
+                        user.leave_hours=k_leave_hours
+                        user.dept_id = k_dept_id
+
+                        db.session.commit()
+
                     # Admin
                     k_work_id = Work.query.count() + 1
                     k_username = row["Staff ID"]
@@ -297,7 +320,6 @@ def upload_file():
                     db.session.add(k_work)
                     db.session.commit()      
 
-
                     # RM
                     k_work_id = Work.query.count() + 1
                     k_username = row["Staff ID"]
@@ -347,30 +369,6 @@ def upload_file():
                     )
                     db.session.add(k_work)
                     db.session.commit() 
-
-                    # user
-                    uu = User.query.filter_by(username=k_username).first()
-                    if not uu:
-                        k_user = User(
-                            # username=random.randint(0, 100000),
-                            username = k_username,
-                            role_id=k_role_id,
-                            # alloc_id=random.randint(0, 120),
-                            leave_hours=k_leave_hours,
-                            dept_id=k_dept_id
-                        )
-
-                        db.session.add(k_user)
-                        db.session.commit()
-                    else:
-                        user = User.query.filter_by(username=k_username).first()
-                        user.role_id = k_role_id
-                        user.leave_hours=k_leave_hours
-                        user.dept_id = k_dept_id
-
-                        db.session.commit()
-
-                    
 
                 flash("File uploaded and data stored as TaskData objects successfully.")
                 return redirect(url_for('assign'))
