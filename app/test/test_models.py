@@ -1,7 +1,6 @@
 import pytest
-from app import create_app, db
-from app.models import User, Role, Department, Login, Work
-from config import Config
+from app import db
+from app.models import User, Role, Department, Work
 from flask import Flask
 
 @pytest.fixture(scope='module')
