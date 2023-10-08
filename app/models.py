@@ -80,7 +80,7 @@ class WorkloadAllocation(db.Model):
     work = db.relationship('Work', backref='workload_allocations')
     __table_args__ = (
         db.CheckConstraint(comment_status.in_(['Read', 'Unread']), name='comment_status_check'), 
-        db.CheckConstraint('workload_point == hours_allocated / user.contract_hour', name='workload_point_check'),
+        # db.CheckConstraint('workload_point == hours_allocated / user.contract_hour', name='workload_point_check'),
     )
     #add index to the table
     db.Index('idx_alloc_id', 'alloc_id')
