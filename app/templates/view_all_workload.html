@@ -159,6 +159,7 @@ block styles %}
         // Case insensitive matching
         // If the column doesn't contain the input, hide the row
         if (
+          filterInputs[index] != undefined && // Obtain value only if the judgment is not empty
           !column.innerText
             .toLowerCase()
             .includes(filterInputs[index].value.toLowerCase())

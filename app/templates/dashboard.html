@@ -19,12 +19,6 @@
                     <h1>Hello, {{ username }}</h1>
                     <p>Following is Your Workload summary</p>
                 </div>
-                <div class="right">
-                    <div class="userInfo">
-                        <h2>Mark Reynolds</h2>
-                        <p>markreynolds@uwa.edu.au</p>
-                    </div>
-                </div>
             </div>
             <div class="bottomContent">
                 <table class="table">
@@ -53,7 +47,8 @@
                 </table>
             </div>
             <div id="container1" style="height: 300px; margin-top: 30px;"></div>
-            <div id="container2" style="height: 350px; margin-top: 30px;"></div>
+            <div id="container2" style="height: 350px; margin-top: 30px; width: 48%;display: inline-block;"></div>
+            <div id="container3" style="height: 350px; margin-top: 30px; width: 48%;display: inline-block;"></div>
         </div>
     </div>
     </html>
@@ -66,6 +61,7 @@
         var departments_value = {{ departments_value|safe }};
 
         var work_type_data = {{ work_type_data|safe }};
+        var work_category_data = {{ work_category_data|safe }};
 
         var option;
 
@@ -118,7 +114,7 @@
 
         option = {
             title: {
-                text: 'work_type',
+                text: 'Task Type',
                 subtext: '',
                 left: 'center'
             },
@@ -135,6 +131,57 @@
                     type: 'pie',
                     radius: '50%',
                     data: work_type_data,
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        },
+                        normal: {
+                            label: {
+                                show: true,
+                                //formatter: '{b} : {c} ({d}%)'
+                                formatter: '{d}%'
+                            },
+                            labelLine: {show: true}
+                        }
+                    }
+                }
+            ]
+        };
+
+        option && myChart.setOption(option);
+
+        var chartDom = document.getElementById('container3');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        option = {
+            title: {
+                text: 'Category',
+                subtext: '',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left'
+            },
+            series: [
+                {
+                    name: 'Hours',
+                    type: 'pie',
+                    radius: '50%',
+                    data: work_category_data,
                     emphasis: {
                         itemStyle: {
                             shadowBlur: 10,

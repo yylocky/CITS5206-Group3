@@ -318,7 +318,7 @@ def dashboard():
 
         works = Work.query.filter_by(dept_id=item.dept_id).all()
         for subitem in works:
-            workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).all()
+            workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).filter_by(username=current_user.username).all()
             for witem in workallcation:
                 value = value + witem.hours_allocated
         departments_value.append(value)
@@ -326,15 +326,20 @@ def dashboard():
     all_work = Work.query.all()
     work_type = []
     work_type_value = []
+    work_category = []
+    work_category_value = []
     for item in all_work:
         if item.work_type not in work_type:
             work_type.append(item.work_type)
+
+        if item.work_category not in work_category:
+            work_category.append(item.work_category)
 
     for item in work_type:
         value = 0
         work = Work.query.filter_by(work_type=item).all()
         for subitem in work:
-            workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).all()
+            workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).filter_by(username=current_user.username).all()
             for witem in workallcation:
                 value = value + witem.hours_allocated
         work_type_value.append(value)
@@ -348,12 +353,50 @@ def dashboard():
         }
         work_type_data.append(temp)
         i = i + 1
+
+    for item in work_category:
+        work_type = []
+        if item == "Service":
+            work_type = ["ADMIN", "GA", "SDS"]
+
+        if item == "Teaching":
+            work_type = ["CWS", "TEACH", "UDEV"]
+
+        if item == "Research":
+            work_type = ["HDR", "ORES", "RES-MGMT", "RESERV"]
+
+        if item == "Leave":
+            work_type = ["LSL", "PL", "SBL"]
+        value = 0
+        for subitem in work_type:
+            work = Work.query.filter_by(work_type=subitem).all()
+            for subitem in work:
+                workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).filter_by(
+                    username=current_user.username).all()
+                for witem in workallcation:
+                    value = value + witem.hours_allocated
+
+        work_category_value.append(value)
+
+    work_category_data = []
+    j = 0
+    for item in work_category:
+        temp = {
+            'name': item,
+            'value': work_category_value[j]
+        }
+        work_category_data.append(temp)
+        j = j + 1
+
+
+
     return render_template('dashboard.html', title='Dashboard',
                            username=current_user.username,
                            workloads=workloads,
                            departments=departments,
                            departments_value=departments_value,
-                           work_type_data=work_type_data
+                           work_type_data=work_type_data,
+                           work_category_data=work_category_data
                            )
 
 
