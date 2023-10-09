@@ -129,3 +129,10 @@ body {
   font-size: 20px;
   cursor: pointer;
 }
+nav ul li{
+  margin-top: -4px;
+}
+
+nav ul li:first-child{
+  margin-top: 0;
+}
