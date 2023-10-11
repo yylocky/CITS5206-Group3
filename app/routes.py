@@ -88,23 +88,29 @@ def assign():
     return render_template('assign_workload.html', title='Assign Workload')
 
 
-@app.route('/edit_allocation_detail')
+@app.route('/edit_allocation_detail', methods=['GET', 'POST'])
 @login_required
 def edit_allocation_detail():
     role_name = get_session()
     if request.method == 'POST':
+        code = 0
+        msg = 'error'
+
         comment = request.form.get('comment')
+        hours_allocated = request.form.get('hours_allocated')
+        workload_point = request.form.get('workload_point')
         if comment is None or comment == '':
-            flash('Invalid Comment')
-            return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name)
+            msg = 'Invalid Comment'
+            rest = {'code': code, 'msg': msg}
+            return rest
 
         user = User.query.filter_by(username=session.get('username', '')).first()
         work = Work.query.filter_by(dept_id=user.dept_id).first()
         work_id = 1
         if work is not None:
             work_id = work.work_id
-        hours_allocated = 4
-        workload_point = 10
+        hours_allocated = hours_allocated
+        workload_point = workload_point
         comment_status = 'Unread'
 
         info = WorkloadAllocation(
@@ -118,8 +124,9 @@ def edit_allocation_detail():
         db.session.add(info)
         db.session.commit()
 
-        flash('Comment Success')
-        return redirect("/edit_allocation_detail")
+        msg = 'Comment Success'
+        rest = {'code': code, 'msg': msg}
+        return rest
 
     workloads = None
     role_id = session.get('role_id', '')

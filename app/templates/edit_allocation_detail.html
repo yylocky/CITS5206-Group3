@@ -129,7 +129,7 @@
                         required
                 ></textarea>
             </div>
-            <button class="btn btn-primary me-2" type="submit">Send Comment</button>
+            <button class="btn btn-primary me-2 send-comment" type="button">Send Comment</button>
         </div>
     </form>
 
@@ -297,6 +297,32 @@
                     alert(res.msg);
                 }
             })
+        })
+
+        // save comments
+        $(".send-comment").click(function (){
+            var hours_allocated = $("#AssignedHours").html();
+            var workload_point = $("#workload_point").html()
+            var comment = $("#exampleFormControlTextarea1").val();
+            if(comment == ""){
+                alert("comment is required");
+                return false;
+            }
+
+            var post = {
+                hours_allocated: hours_allocated,
+                workload_point: workload_point,
+                comment: comment,
+            }
+            $.ajax({
+                type: 'post',
+                url: '/edit_allocation_detail',
+                data: post,
+                success: function (res) {
+                    alert(res.msg);
+                }
+            })
+
         })
 
 
