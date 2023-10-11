@@ -124,7 +124,8 @@ def edit_allocation_detail():
         db.session.add(info)
         db.session.commit()
 
-        msg = 'Comment Success'
+        if info:
+            msg = 'Comment Success'
         rest = {'code': code, 'msg': msg}
         return rest
 
