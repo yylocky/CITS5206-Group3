@@ -242,7 +242,7 @@ def get_user():
 @login_required
 def set_workload_allocation():
     code = 0
-    msg = "Modify Error"
+    msg = "Edit Error"
     alloc_id = request.form.get('alloc_id')
     work_id = request.form.get('work_id')
     work_type = request.form.get('work_type')
@@ -276,7 +276,7 @@ def set_workload_allocation():
     db.session.commit()
     if work:
         code = 1
-        msg = "Modify Success"
+        msg = "Edit successfully"
 
     rest = {'code': code, 'msg': msg}
     return rest
