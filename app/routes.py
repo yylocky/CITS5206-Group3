@@ -104,274 +104,123 @@ ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'} # MW
 @login_required
 def upload_file():
     file = request.files["file"]
-    file_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else '' # MW
-    
-    if file_extension not in ALLOWED_EXTENSIONS: #MW
+    file_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''  # MW
+
+    if file_extension not in ALLOWED_EXTENSIONS:  # MW
         # return "Invalid file type. Please upload a valid Excel file." #MW
-        flash('Invalid file type, please upload again') #MW
-        return redirect(url_for('assign')) #mw
-    
+        flash('Invalid file type, please upload again')  # MW
+        return redirect(url_for('assign'))  # mw
+
     if file.filename != "":
-        #validate the spreadsheet
-        workbook = load_workbook(file)
-        sheet = workbook.active
-        sheet_title = sheet.title
-        print(sheet_title) #testing
-        #data = sheet.values
-        #data = list(data)
-        #headings = data[0] # Assuming the headings are in the first row
-        #expected_headings = ('Staff ID', 'Task Type', 'UnitCode', 'Department', 'Comment', 'Role', 'WorkloadHours', 'leave_hours')
+        try:
 
-        if sheet_title != "UWA_WLAM":
-            # return "This may not be the right spreadsheet as it does not pass the content validation."
-            flash('Invalid spreedsheet, please upload again')
-            return redirect(url_for('assign'))
-        
-        else:
-            # insert DB
+            sheetname = 'UWA_WLAM'
+            workbook = load_workbook(file, read_only=False, data_only=True)
+            sheet = workbook[sheetname]
 
-            try:
-                df = pd.read_excel(file)
-                print("Uploaded Data:")
-                print(df)
+            sheet_title = sheet.title
 
-                for index, row in df.iterrows():
-                    print(f"Row {index + 1}:")
-                    print("Code:", row["Staff ID"])
-                    print("Teach Type:", row["Teach type"])
-                    print("Title:", row["UnitCode"])
-                    print("Dept:", row["Department"])
-                    #print("Comment:", row["Comment"])
-                    print("Staff:", row["Role"])
-                    print("Wkldhours:", row["Wkldhours"])
-                    print("Admin Type of Role:", row["Admin Type of Role"])
-                    print("Admin Hours:", row["Admin Hours"])
-                    print("Leave Type:", row["Leave Type"])
-                    print("Leave days", row["Leave days"])
-                    print("RM Hours", row["RM Hours"])
-                    print("CWS Hours", row["CWS Hours"])
-                    print("RM Justification", row["RM Justification"])
-
-                    print("-" * 20)
-
-                    
-                    #Work allocation
-                    k_work_id = row["Staff ID"]
-                    k_username = k_work_id
-                    k_hours_allocated = row["Wkldhours"]
-                    k_workload_point = 0.5
-                    #k_comment = row["Comment"]
-                    #k_comment_status = 'Unread'
-                    k_taskType = row["Teach type"]
-                    k_unit_code = row["UnitCode"]
-                    #k_leave_hours = row['leave_hours']
-
-                    explanation = ""
-
-                    department_name = row["Department"]
-                    k_dept_id = Department.query.filter_by(dept_name=department_name).first().dept_id
-                    
-                    
-                    role_name = row["Role"]
-                    k_role_id = Role.query.filter_by(role_name=role_name).first().role_id
-
-                    uu = User.query.filter_by(username=k_username).first()
-                    k_workload_point = 1
-                    if not uu or uu.contract_hour==0:
-                        k_workload_point = 1.0
-                    else:
-                        k_contract_hour = uu.contract_hour
-                        k_workload_point = float(k_hours_allocated/k_contract_hour)
-
-                    k_work_id = Work.query.count() + 1
-                    # workload
-                    k_workload_allocation = WorkloadAllocation(
-                        work_id=str(k_work_id),
-                        hours_allocated=float(k_hours_allocated),
-                        username=str(k_username),
-                        # comment=k_comment,
-                        # comment_status=k_comment_status,
-                        workload_point= k_workload_point
-                    )
-
-                    db.session.add(k_workload_allocation)
-                    db.session.commit()
-
-                    # #work
-                    # k_work_explanation = "Some explanation for " + k_taskType
-                    if k_taskType == 'ADMIN':
-                        explanation = role_name + " in " + k_unit_code
-                    if k_taskType == 'CWS':
-                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
-                    if k_taskType == "GA":
-                        explanation = role_name + " in " + k_unit_code
-                    if k_taskType == 'HDR':
-                        explanation = "HDR sup of " + k_work_id
-                    if k_taskType == 'NEMP':
-                        explanation = role_name + " in " + k_unit_code
-                    #if k_taskType == 'CWS':
-                        #explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
-                    if k_taskType == 'RESERV':
-                        explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
-                    # if k_taskType == 'RES - MGMT':
-                        #explanation = "cwk proj sup of " + k_work_id + " in " + k_unit_code
-                    if k_taskType == 'SDS':
-                        explanation = role_name + " in " + k_unit_code
-                    if k_taskType == 'TEACH':
-                        explanation = role_name + " in " + k_unit_code
-                    if k_taskType == 'UDEV':
-                        explanation = role_name + " in " + k_unit_code
-
-                    k_work = Work(
-                        work_id=k_work_id,
-                        work_explanation=explanation,
-                        work_type=k_taskType,
-                        dept_id=k_dept_id,
-                        unit_code=k_unit_code
-                    )
-                    db.session.add(k_work)
-                    db.session.commit()
-
-
-                    # user
-                    uu = User.query.filter_by(username=k_username).first()
-                    if not uu:
-                        k_user = User(
-                            # username=random.randint(0, 100000),
-                            username = k_username,
-                            role_id=k_role_id,
-                            # alloc_id=random.randint(0, 120),
-                            #leave_hours=k_leave_hours,
-                            dept_id=k_dept_id
-                        )
-
-                        db.session.add(k_user)
-                        db.session.commit()
-                    else:
-                        user = User.query.filter_by(username=k_username).first()
-                        user.role_id = k_role_id
-                        #user.leave_hours=k_leave_hours
-                        user.dept_id = k_dept_id
-
-                        db.session.commit()
-
-                    # # Admin
-                    # k_work_id = Work.query.count() + 1
-                    # k_username = row["Staff ID"]
-                    # k_hours_allocated = row["Admin Hours"]
-                    # k_taskType = 'ADMIN'
-                    # explanation = row["Admin Type of Role"]
-
-                    # # Insert allocation record
-                    # k_workload_allocation = WorkloadAllocation(
-                    #     work_id=str(k_work_id),
-                    #     hours_allocated=float(k_hours_allocated),
-                    #     username=str(k_username),
-                    # )
-                    # db.session.add(k_workload_allocation)
-                    # db.session.commit()
-
-                    # # Insert work record
-                    # k_work = Work(
-                    #     work_id=k_work_id,
-                    #     work_explanation=explanation,
-                    #     work_type=k_taskType,
-                    #     #dept_id=k_dept_id,
-                    #     #unit_code=k_unit_code
-                    # )
-                    # db.session.add(k_work)
-                    # db.session.commit()                  
-
-                    # # Leave
-                    # k_work_id = Work.query.count() + 1
-                    # k_username = row["Staff ID"]
-                    # k_hours_allocated = row["Leave days"]
-                    # k_taskType = row["Leave Type"]
-                    # k_leave_hours = float(k_hours_allocated)*7.5
-                    # if k_taskType == 'LSL':
-                    #     explanation = k_username + 'on LSL'
-                    # if k_taskType == 'PL':
-                    #     explanation = k_username + 'on PL'
-                    # if k_taskType == 'SBL':
-                    #     explanation = k_username + 'on SBL'
-
-                    # #Admin-insert work allocation record
-                    # k_workload_allocation = WorkloadAllocation(
-                    #     work_id=str(k_work_id),
-                    #     hours_allocated=float(k_hours_allocated)*7.5,
-                    #     username=str(k_username),
-                    #     # comment=k_comment,
-                    #     # comment_status=k_comment_status,
-                    #     #workload_point= k_workload_point
-                    # )
-                    # db.session.add(k_workload_allocation)
-                    # db.session.commit()
-
-                    # # Admin - Insert work record
-                    # k_work = Work(
-                    #     work_id=k_work_id,
-                    #     work_explanation=explanation,
-                    #     work_type=k_taskType,
-                    #     #dept_id=k_dept_id,
-                    #     #unit_code=k_unit_code
-                    # )
-                    # db.session.add(k_work)
-                    # db.session.commit()      
-
-                    # # RM
-                    # k_work_id = Work.query.count() + 1
-                    # k_username = row["Staff ID"]
-                    # k_hours_allocated = row["RM Hours"]
-                    # k_taskType = 'RES - MGMT'
-                    # explanation = row["RM Justification"]
-
-                    # #RM - insert allocation record
-                    # k_workload_allocation = WorkloadAllocation(
-                    #     work_id=str(k_work_id),
-                    #     hours_allocated=float(k_hours_allocated),
-                    #     username=str(k_username),
-                    # )
-                    # db.session.add(k_workload_allocation)
-                    # db.session.commit()
-                    
-                    # # RM - Insert work record
-                    # k_work = Work(
-                    #     work_id=k_work_id,
-                    #     work_explanation=explanation,
-                    #     work_type=k_taskType,
-                    # )
-                    # db.session.add(k_work)
-                    # db.session.commit()  
-
-                    # # CWS - definition
-                    # k_work_id = Work.query.count() + 1
-                    # k_username = row["Staff ID"]
-                    # k_hours_allocated = row["CWS Hours"]
-                    # k_taskType = "CWS"
-                    # explanation = "cwk proj sup of " + k_work_id
-
-                    # #CWS - add workallocation record
-                    # k_workload_allocation = WorkloadAllocation(
-                    #     work_id=str(k_work_id),
-                    #     hours_allocated=float(k_hours_allocated),
-                    #     username=str(k_username),
-                    # )
-                    # db.session.add(k_workload_allocation)
-                    # db.session.commit()
-
-                    # # RM - Insert work record
-                    # k_work = Work(
-                    #     work_id=k_work_id,
-                    #     work_explanation=explanation,
-                    #     work_type=k_taskType,
-                    # )
-                    # db.session.add(k_work)
-                    # db.session.commit() 
-
-                flash("File uploaded and data stored as TaskData objects successfully.")
+            if sheet_title != sheetname:
+                # return "This may not be the right spreadsheet as it does not pass the content validation."
+                flash('Invalid spreedsheet, please upload again')
                 return redirect(url_for('assign'))
-            except Exception as e:
-                return f"Error: {str(e)}"
+
+            data = []
+            for row in sheet.iter_rows():
+                row_data = []
+                for cell in row:
+                    row_data.append(cell.value)
+                data.append(row_data)
+
+            workbook.close()
+            keys = [
+                "Staff Number",
+                "Type",
+                "Department",
+                "Unit Code",
+                "Explanation",
+                "Assigned Hours",
+            ]
+
+            rest = []
+
+            for item in data[1:]:
+                temp = dict(zip(keys, item))
+                rest.append(temp)
+
+            for item in rest:
+                if item['Staff Number'] is None:
+                    continue
+
+                if item['Department'] is None:
+                    continue
+
+                user = User.query.filter_by(username=item['Staff Number']).first()
+                if user is None:
+                    flash("User {} does not exist.".format(item['Staff Number']))
+                    return redirect(url_for('assign'))
+
+                if user.contract_hour is None or user.contract_hour == 0:
+                    flash("User {} contract_hour is empty.".format(item['Staff Number']))
+                    return redirect(url_for('assign'))
+
+                dept = Department.query.filter_by(dept_name=item['Department']).first()
+                if dept is None:
+                    flash("Department {} does not exist.".format(item['Department']))
+                    return redirect(url_for('assign'))
+
+                # data insert work
+                if item['Unit Code'] is not None:
+                    work_explanation = item['Explanation']
+                    work_type = item['Type']
+                    dept_id = dept.dept_id
+                    unit_code = item['Unit Code']
+
+                    work = Work.query.filter_by(
+                        work_explanation=work_explanation,
+                        work_type=work_type,
+                        dept_id=dept_id,
+                        unit_code=unit_code,
+                    ).first()
+
+                    if work is None:
+                        work = Work(
+                            work_explanation=work_explanation,
+                            work_type=work_type,
+                            dept_id=dept_id,
+                            unit_code=unit_code,
+                        )
+                        db.session.add(work)
+                        db.session.commit()
+
+                    # data insert workload_allocation
+                    work_id = work.work_id
+                    hours_allocated = 0
+                    if item['Assigned Hours'] is not None:
+                        hours_allocated = item['Assigned Hours']
+
+                    username = item['Staff Number']
+                    comment = ''
+                    comment_status = "Unread"
+                    workload_point = 0
+                    if hours_allocated != 0:
+                        workload_point = round(float(hours_allocated) / user.contract_hour, 2)
+
+                    workload_allocation = WorkloadAllocation(
+                        work_id=work_id,
+                        hours_allocated=hours_allocated,
+                        username=username,
+                        comment=comment,
+                        comment_status=comment_status,
+                        workload_point=workload_point,
+                    )
+                    db.session.add(workload_allocation)
+                    db.session.commit()
+
+            flash("File uploaded and data stored as TaskData objects successfully.")
+            return redirect(url_for('assign'))
+        except Exception as e:
+            return f"Error: {str(e)}"
 
     flash("No file selected for upload.")
     return redirect(url_for('assign'))
