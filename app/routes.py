@@ -79,7 +79,8 @@ def view_all_workload():
         workloads = WorkloadAllocation.query.filter_by(
             username=current_user.username).all()
 
-    return render_template('view_all_workload.html', title='View All Workload', workloads=workloads)
+    role_name = get_session()
+    return render_template('view_all_workload.html', title='View All Workload', workloads=workloads, role_name=role_name)
 
 
 @app.route('/assign_workload')

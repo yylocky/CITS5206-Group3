@@ -87,7 +87,7 @@
                     <th scope="col">
                         <input type="text" style="width: auto;" class="form-control" id="AdjustedHours"
                                name="hours_allocated" value=""/>
-                        <input type="hidden" name="alloc_id" id="alloc_id" value=""/>
+                        <input type="hidden" name="alloc_id" id="alloc_id" value="{{ data.alloc_id }}"/>
                         <input type="hidden" name="work_id" id="work_id" value=""/>
                         <input type="hidden" name="workload_point" class="workload_point" value=""/>
                     </th>
@@ -178,7 +178,7 @@
 
             get_work_type(work_category);
             get_department();
-            get_user();
+            // get_user();
             get_works();
         }
 
@@ -278,8 +278,8 @@
         }
 
         $("#modify").click(function () {
-            var alloc_id = $("#work_category option:selected").data('id');
-            $("#alloc_id").val(alloc_id);
+            //var alloc_id = $("#work_category option:selected").data('id');
+            // $("#alloc_id").val(alloc_id);
 
             var workid = $("#work_category option:selected").data('workid');
             $("#work_id").val(workid);
