@@ -103,6 +103,12 @@ ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'} # MW
 @app.route("/upload", methods=["POST"])
 @login_required
 def upload_file():
+    role_id = current_user.user.role_id
+    role = Role.query.filter_by(role_id=role_id).first()
+    if role.role_name == "Staff":
+        flash('Staff cannot use')
+        return redirect(url_for('assign'))
+
     file = request.files["file"]
     file_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''  # MW
 
@@ -198,6 +204,16 @@ def upload_file():
                     hours_allocated = 0
                     if item['Assigned Hours'] is not None:
                         hours_allocated = item['Assigned Hours']
+
+                    typeArr = [
+                        "PL",
+                        "SBL",
+                        "LSL",
+                    ]
+
+                    if item['Type'] in typeArr:
+                        user.leave_hours = hours_allocated
+                        db.session.commit()
 
                     username = item['Staff Number']
                     comment = ''
