@@ -169,7 +169,7 @@ block styles %}
       );
       const csvContent =
         "data:text/csv;charset=utf-8," +
-        encodeURI(generateCSVContent(filteredRows));
+        encodeURIComponent(generateCSVContent(filteredRows));
 
       const link = document.createElement("a");
       link.href = csvContent;
@@ -179,17 +179,38 @@ block styles %}
 
     // Function to generate CSV content from table rows
     function generateCSVContent(rows) {
+      // Get all headers from the table, exclude the last header (Action) and then wrap each header text inside double quotes, escaping any internal double quotes
       const headers = Array.from(document.querySelectorAll(".comment-list th"))
-        .slice(0, -1) // Exclude the last header (Action)
-        .map((header) => header.textContent);
+        .slice(0, -1)
+        .map((header) => `"${header.textContent.replace(/"/g, '""')}"`);
 
-      const rowsContent = rows.map((row) =>
-        Array.from(row.querySelectorAll("td"))
-          .slice(0, -1) // Exclude the last column (View Workload button)
-          .map((cell) => cell.textContent)
-          .join(",")
+      // For each row in the table
+      const rowsContent = rows.map(
+        (row) =>
+          // Get all table data cells, exclude the last cell (View Workload button)
+          Array.from(row.querySelectorAll("td"))
+            .slice(0, -1)
+            .map((cell, index) => {
+              // If the current cell is the comment cell
+              if (index === 1) {
+                // Get the full comment stored in the data attribute of the button
+                let fullComment = cell
+                  .querySelector(".read-details-btn")
+                  .getAttribute("data-comment");
+
+                // Wrap the comment inside double quotes, escaping any internal double quotes
+                // For addressing the issue of comments containing commas that would otherwise be interpreted as a delimiter
+                return `"${fullComment.replace(/"/g, '""')}"`;
+              }
+
+              // For all other cells, wrap the text inside double quotes, escaping any internal double quotes
+              // For addressing the issue of comments containing commas that would otherwise be interpreted as a delimiter
+              return `"${cell.textContent.replace(/"/g, '""')}"`;
+            })
+            .join(",") // Join all the cells for a row with commas
       );
 
+      // Join all the rows with a newline and return the content
       return [headers.join(","), ...rowsContent].join("\n");
     }
 
