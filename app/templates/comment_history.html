@@ -169,7 +169,7 @@ block styles %}
       );
       const csvContent =
         "data:text/csv;charset=utf-8," +
-        encodeURI(generateCSVContent(filteredRows));
+        encodeURIComponent(generateCSVContent(filteredRows));
 
       const link = document.createElement("a");
       link.href = csvContent;
@@ -197,9 +197,6 @@ block styles %}
                 let fullComment = cell
                   .querySelector(".read-details-btn")
                   .getAttribute("data-comment");
-
-                // Replace any '#' with the string '(hash)' to avoiding commenting out the rest of the comment
-                fullComment = fullComment.replace(/#/g, "(hash)");
 
                 // Wrap the comment inside double quotes, escaping any internal double quotes
                 // For addressing the issue of comments containing commas that would otherwise be interpreted as a delimiter
