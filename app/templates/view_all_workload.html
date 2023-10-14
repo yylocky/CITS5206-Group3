@@ -269,7 +269,7 @@ block styles %}
     const csvContent =
       // for downloading csv file
       "data:text/csv;charset=utf-8," +
-      encodeURI(generateCSVContent(filteredRows));
+      encodeURIComponent(generateCSVContent(filteredRows));
 
     const link = document.createElement("a");
     link.href = csvContent;
@@ -284,7 +284,7 @@ block styles %}
     ).map((header) => header.textContent.trim());
     const rowsContent = rows.map((row) =>
       Array.from(row.querySelectorAll("td"))
-        .map((cell) => cell.textContent.trim())
+        .map((cell) => `"${cell.textContent.trim().replace(/"/g, '""')}"`) // wrap the cell content in double quotes and escape double quotes in the cell content
         .join(",")
     );
 
