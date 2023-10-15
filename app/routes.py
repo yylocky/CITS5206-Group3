@@ -189,7 +189,6 @@ def assign_task():
             work_id=k_work.work_id,
             hours_allocated=float(k_hours_allocated),
             username=int(k_username),
-            comment=k_comment,
             comment_status=k_comment_status,
             workload_point=float(k_workload_point)
         )
