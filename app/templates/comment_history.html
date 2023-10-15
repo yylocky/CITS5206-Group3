@@ -80,7 +80,21 @@ block styles %}
         <!-- comments variable defined in routes.py -->
         <tr>
           <td>{{ comment.username }}</td>
-          <td>{{ comment.comment }}</td>
+          <td>
+            <span class="comment-text">
+              <!-- Display up to 50 characters under the Comment column -->
+              {{ comment.comment[:50] }}{% if comment.comment|length > 50
+              %}...{% endif %}
+            </span>
+            <!-- Button for triggering a modal pop-up to display full comment contents -->
+            <button
+              class="read-details-btn"
+              data-comment="{{ comment.comment }}"
+              data-alloc-id="{{ comment.alloc_id }}"
+            >
+              Read Details
+            </button>
+          </td>
           <td>{{ comment.comment_status }}</td>
           <!-- View Workload button - redirecting HoD users to the View Workload page for viewing the workload entry corresponding to a particular comment -->
           <td>
@@ -155,7 +169,7 @@ block styles %}
       );
       const csvContent =
         "data:text/csv;charset=utf-8," +
-        encodeURI(generateCSVContent(filteredRows));
+        encodeURIComponent(generateCSVContent(filteredRows));
 
       const link = document.createElement("a");
       link.href = csvContent;
@@ -165,17 +179,38 @@ block styles %}
 
     // Function to generate CSV content from table rows
     function generateCSVContent(rows) {
+      // Get all headers from the table, exclude the last header (Action) and then wrap each header text inside double quotes, escaping any internal double quotes
       const headers = Array.from(document.querySelectorAll(".comment-list th"))
-        .slice(0, -1) // Exclude the last header (Action)
-        .map((header) => header.textContent);
+        .slice(0, -1)
+        .map((header) => `"${header.textContent.replace(/"/g, '""')}"`);
 
-      const rowsContent = rows.map((row) =>
-        Array.from(row.querySelectorAll("td"))
-          .slice(0, -1) // Exclude the last column (View Workload button)
-          .map((cell) => cell.textContent)
-          .join(",")
+      // For each row in the table
+      const rowsContent = rows.map(
+        (row) =>
+          // Get all table data cells, exclude the last cell (View Workload button)
+          Array.from(row.querySelectorAll("td"))
+            .slice(0, -1)
+            .map((cell, index) => {
+              // If the current cell is the comment cell
+              if (index === 1) {
+                // Get the full comment stored in the data attribute of the button
+                let fullComment = cell
+                  .querySelector(".read-details-btn")
+                  .getAttribute("data-comment");
+
+                // Wrap the comment inside double quotes, escaping any internal double quotes
+                // For addressing the issue of comments containing commas that would otherwise be interpreted as a delimiter
+                return `"${fullComment.replace(/"/g, '""')}"`;
+              }
+
+              // For all other cells, wrap the text inside double quotes, escaping any internal double quotes
+              // For addressing the issue of comments containing commas that would otherwise be interpreted as a delimiter
+              return `"${cell.textContent.replace(/"/g, '""')}"`;
+            })
+            .join(",") // Join all the cells for a row with commas
       );
 
+      // Join all the rows with a newline and return the content
       return [headers.join(","), ...rowsContent].join("\n");
     }
 
@@ -201,6 +236,80 @@ block styles %}
           error
         );
       });
+  });
+
+  // Function to update comment status in the database
+  function updateCommentStatus(alloc_id, callback) {
+    // Use the fetch API to make a POST request to the update_comment_status route
+    fetch(`/update_comment_status/${alloc_id}`, {
+      method: "POST",
+    })
+      .then((response) => {
+        // Parse the response body as JSON
+        return response.json();
+      })
+      .then((data) => {
+        // If the server responds with either "success" or "alreadyRead", call the callback function without an error
+        if (data.status === "success" || data.status === "alreadyRead") {
+          callback(null);
+        } else {
+          // If there's a different status, call the callback function with an error message
+          callback("Failed to update comment status.");
+        }
+      })
+      .catch((error) => {
+        // If there is an error in the fetch operation, call the callback function with the error
+        callback(error);
+      });
+  }
+
+  // Event listener for Read Details buttons
+  document.querySelectorAll(".read-details-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const commentText = this.getAttribute("data-comment");
+      const alloc_id = this.getAttribute("data-alloc-id");
+
+      // Reference to the current button's parent row (for displaying updated comment status)
+      const currentRow = this.closest("tr");
+
+      // Populate a modal (pop-up window) with full comment contents and handle the "Read & Close" button functionality (close modal and update comment_status)
+      const modal = document.createElement("div");
+      modal.innerHTML = `
+              <div class="modal-content">
+                  <div class="modal-header">Comment Details</div>
+                  <div class="modal-body">${commentText}</div>
+                  <div class="modal-footer">
+                      <button class="read-close-btn">Read & Close</button>
+                  </div>
+              </div>
+          `;
+      modal.classList.add("modal");
+      document.body.appendChild(modal);
+
+      // Close the modal and display updated comment status after clicking the Read & Close button
+      modal
+        .querySelector(".read-close-btn")
+        .addEventListener("click", function () {
+          updateCommentStatus(alloc_id, (error) => {
+            // If there is an error, log it, but still close the modal.
+            if (error) {
+              console.error(error);
+            } else {
+              // Display the updated comment status
+              currentRow.querySelector("td:nth-child(3)").textContent = "Read";
+            }
+            // Close the modal
+            modal.remove();
+          });
+        });
+
+      // Close the modal when clicking outside of it
+      modal.addEventListener("click", function (event) {
+        if (event.target === modal) {
+          modal.remove();
+        }
+      });
+    });
   });
 </script>
 {% endblock %}
