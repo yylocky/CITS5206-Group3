@@ -128,11 +128,30 @@ block styles %}
         </tr>
         {% endfor %}
       </tbody>
+      <tfoot>
+        <tr style="background-color: rgb(40, 52, 139); font-weight: bold; color: white;">
+          <td colspan="6"> Total Assigned Hours:</td>
+          <td id="totalHours"></td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 </div>
 
 <script>
+  // Total hours calculation
+  function upadteTotalHours() {
+    const visibleRows = Array.from(rows).filter(
+      (row) => row.style.display !== "none"
+    );
+    const totalHours = visibleRows.reduce((total, row) =>{
+        const hours = parseFloat(row.querySelectorAll("td")[6].textContent.trim()) || 0;
+        return total + hours;
+    }, 0);
+
+    document.getElementById("totalHours").textContent = totalHours;
+  }
   // Filter table
   const filterInputs = document.querySelectorAll(".filter-input");
   const rows = document.querySelectorAll(".workload-table tbody tr");
@@ -174,6 +193,8 @@ block styles %}
         row.style.display = "";
       }
     });
+
+    upadteTotalHours();
   }
 
   // Sort table
@@ -221,6 +242,8 @@ block styles %}
     sortedRows.forEach((row) => {
       tbody.appendChild(row);
     });
+
+    upadteTotalHours();
   }
 
   // Export CSV
@@ -235,10 +258,21 @@ block styles %}
     const filteredRows = Array.from(rows).filter(
       (row) => row.style.display !== "none"
     );
+
+    // create a new row for total hours and add it to the filtered rows array
+    const totalHoursRow = document.createElement("tr");
+    totalHoursRow.innerHTML = `
+      <td> Total Assigned Hours</td>
+      <td></td><td></td><td></td><td></td><td></td>
+      <td>${document.getElementById("totalHours").textContent}</td>
+      <td></td>
+    `;
+    filteredRows.push(totalHoursRow);
+
     const csvContent =
       // for downloading csv file
       "data:text/csv;charset=utf-8," +
-      encodeURI(generateCSVContent(filteredRows));
+      encodeURIComponent(generateCSVContent(filteredRows));
 
     const link = document.createElement("a");
     link.href = csvContent;
@@ -253,11 +287,13 @@ block styles %}
     ).map((header) => header.textContent.trim());
     const rowsContent = rows.map((row) =>
       Array.from(row.querySelectorAll("td"))
-        .map((cell) => cell.textContent.trim())
+        .map((cell) => `"${cell.textContent.trim().replace(/"/g, '""')}"`) // wrap the cell content in double quotes and escape double quotes in the cell content
         .join(",")
     );
 
     return [headers.join(","), ...rowsContent].join("\n");
   }
+  //Initial total hours calculation on page load
+  window.onload = upadteTotalHours;
 </script>
 {% endblock %}
