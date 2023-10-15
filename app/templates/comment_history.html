@@ -75,8 +75,9 @@ block styles %}
       </thead>
 
       <tbody>
-        <!-- Iterate over each comment and display its data -->
-        {% for comment in comments %}
+        <!-- Iterate over each comment and display its data if status is "Unread" or "Read" -->
+        {% for comment in comments if comment.comment_status in ["Unread",
+        "Read"] %}
         <!-- comments variable defined in routes.py -->
         <tr>
           <td>{{ comment.username }}</td>
