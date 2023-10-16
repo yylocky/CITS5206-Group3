@@ -36,7 +36,13 @@
                         <tr>
                             <td>{{ workload.work.work_category }}</td>
                             <td>{{ workload.work.work_type }}</td>
-                            <td>{{ workload.user.department.dept_name }}</td>
+                            <td>
+                                {% if workload.work.work_type in ['LSL', 'PL', 'SBL'] %}
+                                    {{workload.user.department.dept_name }}
+                                {% else %}
+                                    {{workload.work.department.dept_name }}
+                                {% endif %}
+                            </td>
                             <td>{{ workload.work.unit_code }}</td>
                             <td>{{ workload.user.username }}</td>
                             <td>{{ workload.work.work_explanation }}</td>

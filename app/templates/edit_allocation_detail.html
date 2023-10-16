@@ -45,40 +45,75 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <th scope="col">
-                        <select class="form-select" name="work_category" id="work_category">
+                    <td scope="col">
+                        <span>
                             {% for workload in workloads %}
-                                <option value="{{ workload.work.work_category }}"
-                                        data-id="{{ workload.alloc_id }}"
-                                        data-workid="{{ workload.work_id }}"
-                                        data-username="{{ workload.username }}"
-                                        data-workexplanation="{{ workload.work.work_explanation }}"
-                                        data-hoursallocated="{{ workload.hours_allocated }}"
-                                        data-worktype="{{ workload.work.work_type }}"
-                                        {% if data.alloc_id == workload.alloc_id %} selected {% endif %} >{{ workload.work.work_category }}</option>
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.work_category }}
+                                    <input type="hidden"
+                                           name="work_category"
+                                           id="work_category"
+                                           value="{{ workload.work.work_category }}"
+                                           data-hoursallocated="{{ data.hours_allocated }}"
+                                    >
+                                {% endif %}
                             {% endfor %}
-                        </select>
-                    </th>
-                    <th scope="col">
-                        <select class="form-select" name="work_type" id="work_type"></select>
-                    </th>
-                    <th scope="col">
-                        <select class="form-select" name="department" id="department"></select>
-                    </th>
-                    <th scope="col">
-                        <select class="form-select" name="unit_code" id="unit_code">
+                        </span>
+                    </td>
+                    <td scope="col">
+                        <span>
                             {% for workload in workloads %}
-                                <option value="{{ workload.work.unit_code }}" {% if data.UnitCode == workload.work.unit_code %} selected {% endif %}>{{ workload.work.unit_code }}</option>
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.work_type }}
+                                    <input type="hidden"
+                                           name="work_type"
+                                           id="work_type"
+                                           value="{{ workload.work.work_type }}"
+                                           data-deptid="{{ workload.work.dept_id }}"
+                                    >
+                                {% endif %}
                             {% endfor %}
-                        </select>
-                    </th>
-                    <th scope="col">
-                        <select class="form-select" name="username" id="username"></select>
-                    </th>
-
-                    <th scope="col">
-                        <select class="form-select" name="work_explanation" id="work_explanation"></select>
-                    </th>
+                        </span>
+                    </td>
+                    <td scope="col">
+                        <span id="department"></span>
+                    </td>
+                    <td scope="col">
+                        <span>
+                            {% for workload in workloads %}
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.unit_code }}
+                                    <input type="hidden"
+                                           name="unit_code"
+                                           id="unit_code"
+                                           value="{{ workload.work.unit_code }}"
+                                    >
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td scope="col">
+                        <span>{{ data.username }}</span>
+                        <input type="hidden"
+                               name="username"
+                               id="username"
+                               value="{{ data.username }}"
+                        >
+                    </td>
+                    <td scope="col">
+                        <span>
+                            {% for workload in workloads %}
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.work_explanation }}
+                                    <input type="hidden"
+                                           name="work_explanation"
+                                           id="work_explanation"
+                                           value="{{ workload.work.work_explanation }}"
+                                    >
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
 
                     <th scope="col">
                         <span id="AssignedHours"></span>
@@ -166,7 +201,7 @@
         })
 
         function initData(work_category) {
-            var hours_allocated = $("#work_category option:selected").data('hoursallocated');
+            var hours_allocated = $("#work_category").data('hoursallocated');
             $("#AssignedHours").html(hours_allocated);
 
             hours_allocated = parseFloat(hours_allocated);
@@ -176,114 +211,23 @@
             workload_point = hours_allocated / workload_point
             $("#workload_point").html(workload_point.toFixed(2));
 
-            get_work_type(work_category);
             get_department();
-            // get_user();
-            get_works();
         }
-
-        get_work_type($("#work_category").val());
-
-        function get_work_type(work_category) {
-            var work_type = $("#work_category option:selected").data('worktype');
-            $.ajax({
-                type: 'post',
-                url: '/get_work_type',
-                data: {work_category: work_category},
-                success: function (res) {
-                    var html = '';
-                    for (let i = 0; i < res.length; i++) {
-                        if (work_type == res[i]) {
-                            html += '<option value="' + res[i] + '" selected >' + res[i] + '</option>';
-                        } else {
-                            html += '<option value="' + res[i] + '">' + res[i] + '</option>';
-                        }
-                    }
-                    $("#work_type").html(html);
-                }
-            })
-        }
-
-        get_department();
 
         function get_department() {
-            var work_id = $("#work_category option:selected").data('workid');
+            var dept_id = $("#work_type").data('deptid');
+            console.log(dept_id);
             $.ajax({
                 type: 'post',
-                url: '/get_work',
-                data: {work_id: work_id},
-                success: function (rest) {
-                    $.ajax({
-                        type: 'post',
-                        url: '/get_department',
-                        data: {},
-                        success: function (res) {
-                            var html = '';
-                            for (let i = 0; i < res.length; i++) {
-                                if (rest.dept_id == res[i].dept_id) {
-                                    html += '<option value="' + res[i].dept_id + '" selected>' + res[i].dept_name + '</option>';
-                                } else {
-                                    html += '<option value="' + res[i].dept_id + '">' + res[i].dept_name + '</option>';
-                                }
-                            }
-                            $("#department").html(html);
-                        }
-                    })
-                }
-            })
-        }
-
-        get_user();
-
-        function get_user() {
-            var username = $("#work_category option:selected").data('username');
-            $.ajax({
-                type: 'post',
-                url: '/get_user',
-                data: {},
+                url: '/get_department',
+                data: {dept_id: dept_id},
                 success: function (res) {
-                    var html = '';
-                    for (let i = 0; i < res.length; i++) {
-                        if (username == res[i].username) {
-                            html += '<option value="' + res[i].username + '" selected>' + res[i].username + '</option>';
-                        } else {
-                            html += '<option value="' + res[i].username + '">' + res[i].username + '</option>';
-                        }
-                    }
-                    $("#username").html(html);
-                }
-            })
-        }
-
-        get_works();
-
-        function get_works() {
-            var work_id = $("#work_category option:selected").data('workid');
-            $.ajax({
-                type: 'post',
-                url: '/get_works',
-                data: {},
-                success: function (res) {
-                    var html = '';
-                    for (let i = 0; i < res.length; i++) {
-                        if (work_id == res[i].work_id) {
-                            html += '<option value="' + res[i].work_explanation + '" selected>' + res[i].work_explanation + '</option>';
-                        } else {
-                            html += '<option value="' + res[i].work_explanation + '">' + res[i].work_explanation + '</option>';
-                        }
-                    }
-                    $("#work_explanation").html(html);
+                    $("#department").html(res.dept_name);
                 }
             })
         }
 
         $("#modify").click(function () {
-            //var alloc_id = $("#work_category option:selected").data('id');
-            // $("#alloc_id").val(alloc_id);
-
-            var workid = $("#work_category option:selected").data('workid');
-            $("#work_id").val(workid);
-
             var post = $("#workload_allocation").serialize();
             var assignedHours = $("#assignedHours").val();
             if (assignedHours == "") {
@@ -301,8 +245,7 @@
 
         // save comments
         $(".send-comment").click(function (){
-            var hours_allocated = $("#AssignedHours").html();
-            var workload_point = $("#workload_point").html()
+            var alloc_id = $("#alloc_id").val();
             var comment = $("#exampleFormControlTextarea1").val();
             if(comment == ""){
                 alert("comment is required");
@@ -310,8 +253,7 @@
             }
 
             var post = {
-                hours_allocated: hours_allocated,
-                workload_point: workload_point,
+                alloc_id: alloc_id,
                 comment: comment,
             }
             $.ajax({

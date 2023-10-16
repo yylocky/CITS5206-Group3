@@ -97,34 +97,16 @@ def edit_allocation_detail():
         code = 0
         msg = 'error'
 
+        alloc_id = request.form.get('alloc_id')
         comment = request.form.get('comment')
-        hours_allocated = request.form.get('hours_allocated')
-        workload_point = request.form.get('workload_point')
         if comment is None or comment == '':
             msg = 'Invalid Comment'
             rest = {'code': code, 'msg': msg}
             return rest
 
-        user = User.query.filter_by(username=session.get('username', '')).first()
-        work = Work.query.filter_by(dept_id=user.dept_id).first()
-        work_id = 1
-        if work is not None:
-            work_id = work.work_id
-        hours_allocated = hours_allocated
-        workload_point = workload_point
-        comment_status = 'Unread'
-
-        info = WorkloadAllocation(
-            work_id=work_id,
-            hours_allocated=hours_allocated,
-            workload_point=workload_point,
-            username=user.username,
-            comment=comment,
-            comment_status=comment_status
-        )
-        db.session.add(info)
+        info = WorkloadAllocation.query.filter_by(alloc_id=alloc_id).first()
+        info.comment = comment
         db.session.commit()
-
         if info:
             msg = 'Comment Success'
         rest = {'code': code, 'msg': msg}
@@ -210,6 +192,15 @@ def get_works():
 @app.route('/get_department', methods=['GET', 'POST'])
 @login_required
 def get_department():
+    dept_id = request.form.get('dept_id')
+    if dept_id is not None:
+        department = Department.query.filter_by(dept_id=dept_id).first()
+        rest = {
+            'dept_id': department.dept_id,
+            'dept_name': department.dept_name,
+        }
+        return rest
+
     departments = Department.query.all()
     rest = []
     for item in departments:
@@ -245,13 +236,7 @@ def set_workload_allocation():
     code = 0
     msg = "Edit Error"
     alloc_id = request.form.get('alloc_id')
-    work_id = request.form.get('work_id')
-    work_type = request.form.get('work_type')
-    department = request.form.get('department')
-    work_explanation = request.form.get('work_explanation')
-    unit_code = request.form.get('unit_code')
     hours_allocated = request.form.get('hours_allocated')
-    username = request.form.get('username')
     workload_point = request.form.get('workload_point')
     if hours_allocated is None or hours_allocated == "":
         rest = {'code': code, 'msg': "Adjusted Hours Is Required"}
@@ -262,20 +247,11 @@ def set_workload_allocation():
         return rest
 
     workload = WorkloadAllocation.query.filter_by(alloc_id=alloc_id).first()
-
-    workload.work_id = work_id
     workload.hours_allocated = hours_allocated
-    workload.username = username
     workload.workload_point = workload_point
 
-    work = Work.query.filter_by(work_id=work_id).first()
-    work.work_type = work_type
-    work.dept_id = department
-    work.work_explanation = work_explanation
-    work.unit_code = unit_code
-
     db.session.commit()
-    if work:
+    if workload:
         code = 1
         msg = "Edit successfully"
 
