@@ -4,13 +4,13 @@ block content %}
   rel="stylesheet"
   href="{{ url_for('static', filename='css/base.css') }}"
 />
-<link 
-rel="stylesheet" 
-href="{{ url_for('static', filename='css/view_workload.css') }}"
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/view_workload.css') }}"
 />
 <div class="container mt-5">
   <!-- Workload Assignment Section -->
-  <h3>Workload Assignment [HoS only]</h3>
+  <h3>Workload Assignment</h3>
   <div class="assignmentContainer">
     <div class="row mt-2 assignmentRow">
       <div class="col-2">
@@ -75,63 +75,39 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
   </div>
 
   <!-- File Upload Section -->
-  <h3 class="mt-5">File Upload [HoS / HoDs / Admin]</h3>
+  <h3 class="mt-5">File Upload</h3>
   <div class="uploadContainer">
-    <div class="row mt-2 uploadRow">
-      <div class="col-2">
-        <label class="form-label">Spreadsheet No.</label>
-        Spreadsheet 1
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <div class="row mt-2 uploadRow">
+        <div class="col-4">
+          <label for="uploadFile" class="form-label">Upload File</label>
+          <input
+            type="file"
+            name="file"
+            class="form-control"
+            id="uploadFile"
+            accept=".xlsx, .xls, .csv, .tsv"
+          />
+          <small class="form-text text-danger" style="display: none"
+            >Invalid file type</small
+          >
+        </div>
+        <div class="col d-flex align-items-end">
+          <button type="submit" class="btn btn-primary me-2">Upload</button>
+        </div>
       </div>
-      <div class="col-4">
-        <label for="uploadFile" class="form-label">Upload File</label>
-        <input
-          type="file"
-          class="form-control"
-          id="uploadFile"
-          accept=".xlsx, .xls, .csv, .tsv"
-        />
-        <small class="form-text text-danger" style="display: none"
-          >Invalid file type</small
-        >
-      </div>
-      <div class="col d-flex align-items-end">
-        <button class="btn btn-primary me-2">Upload</button>
-      </div>
-    </div>
-    <button
-      class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
-      onclick="addUploadRow()"
-    >
-      Add File
-    </button>
+    </form>
   </div>
 
-  <!-- Approval of Uploaded Assignment Section -->
-  <h3 class="mt-5">[TBC] Approval of Uploaded Assignment [HoS only]</h3>
-  <div class="approvalContainer">
-    {% for spreadsheet in ["Spreadsheet 1", "Spreadsheet 2", "Spreadsheet 3"] %}
-    <div class="row mt-2 approvalRow">
-      <div class="col-2">{{ spreadsheet }}</div>
-      <div class="col-1">
-        <button class="btn btn-primary">Download</button>
-      </div>
-      <div class="col">
-        <button class="btn btn-success">Approve</button>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
+  <script>
+    let asgNumber = 1;
 
-<script>
-  let asgNumber = 1;
+    function addAssignmentRow() {
+      // Increment the assignment number
+      asgNumber += 1;
 
-  function addAssignmentRow() {
-    // Increment the assignment number
-    asgNumber += 1;
-
-    // Define the new row's HTML content
-    let newRowHTML = `
+      // Define the new row's HTML content
+      let newRowHTML = `
       <div class="row mt-2 assignmentRow">
         <div class="col-2">
           Assignment ${asgNumber}
@@ -189,28 +165,28 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
       </div>
     `;
 
-    // Get the last assignment row
-    let assignmentRows = document.querySelectorAll(".assignmentRow");
-    let lastRow = assignmentRows[assignmentRows.length - 1];
+      // Get the last assignment row
+      let assignmentRows = document.querySelectorAll(".assignmentRow");
+      let lastRow = assignmentRows[assignmentRows.length - 1];
 
-    // Add the new row below the last row
-    lastRow.insertAdjacentHTML("afterend", newRowHTML);
-  }
+      // Add the new row below the last row
+      lastRow.insertAdjacentHTML("afterend", newRowHTML);
+    }
 
-  function removeAsgRow(btnElement) {
-    asgNumber -= 1;
-    let row = btnElement.closest(".row");
-    row.remove();
-  }
+    function removeAsgRow(btnElement) {
+      asgNumber -= 1;
+      let row = btnElement.closest(".row");
+      row.remove();
+    }
 
-  let sprNumber = 1;
+    let sprNumber = 1;
 
-  function addUploadRow() {
-    // Increment the spreadsheet number
-    sprNumber += 1;
+    function addUploadRow() {
+      // Increment the spreadsheet number
+      sprNumber += 1;
 
-    // Define the new row's HTML content
-    let newRowHTML = `
+      // Define the new row's HTML content
+      let newRowHTML = `
       <div class="row mt-2 uploadRow">
         <div class="col-2">
           Spreadsheet ${sprNumber}
@@ -227,19 +203,20 @@ href="{{ url_for('static', filename='css/view_workload.css') }}"
       </div>
     `;
 
-    // Get the last upload row
-    let uploadRows = document.querySelectorAll(".uploadRow");
-    let lastRow = uploadRows[uploadRows.length - 1];
+      // Get the last upload row
+      let uploadRows = document.querySelectorAll(".uploadRow");
+      let lastRow = uploadRows[uploadRows.length - 1];
 
-    // Add the new row below the last row
-    lastRow.insertAdjacentHTML("afterend", newRowHTML);
-  }
+      // Add the new row below the last row
+      lastRow.insertAdjacentHTML("afterend", newRowHTML);
+    }
 
-  function removeSprRow(btnElement) {
-    sprNumber -= 1;
-    let row = btnElement.closest(".row");
-    row.remove();
-  }
-</script>
+    function removeSprRow(btnElement) {
+      sprNumber -= 1;
+      let row = btnElement.closest(".row");
+      row.remove();
+    }
+  </script>
 
-{% endblock %}
+  {% endblock %}
+</div>
