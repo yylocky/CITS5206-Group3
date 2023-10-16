@@ -131,9 +131,12 @@ def upload_file():
             workbook = load_workbook(file, read_only=False, data_only=True)
             sheet = workbook[sheetname]
 
-            sheet_title = sheet.title
+            data = sheet.values
+            data = list(data)
+            headings = data[0] # Assuming the headings are in the first row
+            expected_headings = ('Staff Number', 'Type', 'Department', 'Unit Code', 'Explanation', 'Assigned Hours')
 
-            if sheet_title != sheetname:
+            if headings != expected_headings:
                 # return "This may not be the right spreadsheet as it does not pass the content validation."
                 flash('Invalid spreedsheet, please upload again')
                 return redirect(url_for('assign'))
