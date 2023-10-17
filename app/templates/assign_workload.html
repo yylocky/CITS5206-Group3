@@ -4,10 +4,7 @@ block content %}
   rel="stylesheet"
   href="{{ url_for('static', filename='css/base.css') }}"
 />
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/view_workload.css') }}"
-/>
+
 <div class="container mt-5">
   <!-- Workload Assignment Section -->
   <h3>Workload Assignment</h3>
@@ -129,25 +126,27 @@ block content %}
   <!-- File Upload Section -->
   <h3 class="mt-5">File Upload</h3>
   <div class="uploadContainer">
-    <div class="row mt-2 uploadRow">
-      <div class="col-4">
-        <label for="uploadFile" class="form-label">Upload File</label>
-        <input
-          type="file"
-          class="form-control"
-          id="uploadFile"
-          accept=".xlsx, .xls, .csv, .tsv"
-        />
-        <small class="form-text text-danger" style="display: none"
-          >Invalid file type</small
-        >
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <div class="row mt-2 uploadRow">
+        <div class="col-4">
+          <label for="uploadFile" class="form-label">Upload File</label>
+          <input
+            type="file"
+            name="file"
+            class="form-control"
+            id="uploadFile"
+            accept=".xlsx, .xls, .csv, .tsv"
+          />
+          <small class="form-text text-danger" style="display: none"
+            >Invalid file type</small
+          >
+        </div>
+        <div class="col d-flex align-items-end">
+          <button type="submit" class="btn btn-primary me-2">Upload</button>
+        </div>
       </div>
-      <div class="col d-flex align-items-end">
-        <button class="btn btn-primary me-2">Upload</button>
-      </div>
-    </div>
+    </form>
   </div>
-</div>
 
 <script>
       function openModal() {
@@ -391,4 +390,5 @@ block content %}
   }
 </script>
 
-{% endblock %}
+  {% endblock %}
+</div>
