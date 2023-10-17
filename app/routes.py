@@ -203,14 +203,11 @@ def get_works():
 
     return rest
 
-@app.route("/get_department", methods=["POST"], endpoint="get_department_view")
+
+@app.route('/get_department', methods=['GET', 'POST'])
 @login_required
 def get_department():
 
-
-#@app.route('/get_department', methods=['GET', 'POST'])
-#@login_required
-#def get_department():
     dept_id = request.form.get('dept_id')
     if dept_id is not None:
         department = Department.query.filter_by(dept_id=dept_id).first()
