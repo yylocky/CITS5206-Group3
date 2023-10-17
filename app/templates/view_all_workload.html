@@ -97,6 +97,7 @@ block styles %}
           <th class="sortable">Explanation <i class="fas fa-sort"></i></th>
           <th class="sortable">Assigned Hours <i class="fas fa-sort"></i></th>
           <th class="sortable">Workload Point <i class="fas fa-sort"></i></th>
+          <th class="">Action</th>
         </tr>
       </thead>
 
@@ -123,6 +124,7 @@ block styles %}
           <td>{{ workload.work.work_explanation }}</td>
           <td>{{ workload.hours_allocated }}</td>
           <td>{{ workload.workload_point }}</td>
+          <td><a href="/edit_allocation_detail?alloc_id={{ workload.alloc_id }}">{% if role_name == 'HoS' or role_name == 'HoD' or role_name == 'Admin' %}Edit/{% endif %}Comment</a></td>
         </tr>
         {% endfor %}
       </tbody>
@@ -176,6 +178,7 @@ block styles %}
         // Case insensitive matching
         // If the column doesn't contain the input, hide the row
         if (
+          filterInputs[index] != undefined && // Obtain value only if the judgment is not empty
           !column.innerText
             .toLowerCase()
             .includes(filterInputs[index].value.toLowerCase())

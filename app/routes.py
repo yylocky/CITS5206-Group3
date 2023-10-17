@@ -9,7 +9,9 @@ import re
 import random
 from flask import g
 from flask import session
+
 import uuid
+
 # decorator for login page
 
 
@@ -28,6 +30,7 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('login')
+        set_session(user)
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
@@ -79,7 +82,8 @@ def view_all_workload():
         workloads = WorkloadAllocation.query.filter_by(
             username=current_user.username).all()
 
-    return render_template('view_all_workload.html', title='View All Workload', workloads=workloads)
+    role_name = get_session()
+    return render_template('view_all_workload.html', title='View All Workload', workloads=workloads, role_name=role_name)
 
 
 @app.route('/assign_workload')
@@ -96,10 +100,180 @@ def assign():
     return render_template('assign_workload.html', title='Assign Workload', usernames=usernames)
 
 
-@app.route('/edit_allocation_detail')
+@app.route('/edit_allocation_detail', methods=['GET', 'POST'])
 @login_required
 def edit_allocation_detail():
-    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
+    role_name = get_session()
+    if request.method == 'POST':
+        code = 0
+        msg = 'error'
+
+        alloc_id = request.form.get('alloc_id')
+        comment = request.form.get('comment')
+        if comment is None or comment == '':
+            msg = 'Invalid Comment'
+            rest = {'code': code, 'msg': msg}
+            return rest
+
+        info = WorkloadAllocation.query.filter_by(alloc_id=alloc_id).first()
+        info.comment = comment
+
+        # update comment status to unread
+        info.comment_status = "Unread"
+
+        db.session.commit()
+        if info:
+            msg = 'Comment successfully'
+        rest = {'code': code, 'msg': msg}
+        return rest
+
+    workloads = None
+    role_id = session.get('role_id', '')
+    username = session.get('username', '')
+    user = User.query.filter_by(username=username, role_id=role_id).first()
+    # if current user is admin(4) or hod(1), show all workload
+    if role_id == 4 or role_id == 1:
+        workloads = WorkloadAllocation.query.all()
+
+    # if current user is HoD(2), show only their department workload
+    elif role_id == 2:
+        workloads = WorkloadAllocation.query.join(Work, Work.work_id == WorkloadAllocation.work_id).filter(
+            Work.dept_id == user.dept_id).all()
+
+    # if current user is staff(3), show only their workload
+    elif role_id == 3:
+        workloads = WorkloadAllocation.query.filter_by(username=username).all()
+
+    data = None
+    if request.args.get('alloc_id') is not None:
+        data = WorkloadAllocation.query.filter_by(
+            alloc_id=request.args.get('alloc_id')).first()
+    return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name,
+                           workloads=workloads, user=user, data=data)
+
+
+@app.route('/get_work_type', methods=['GET', 'POST'])
+@login_required
+def get_work_type():
+    work_type = []
+    work_category = request.form.get('work_category')
+    if work_category == "Service":
+        work_type = ["ADMIN", "GA", "SDS"]
+
+    if work_category == "Teaching":
+        work_type = ["CWS", "TEACH", "UDEV"]
+
+    if work_category == "Research":
+        work_type = ["HDR", "ORES", "RES-MGMT", "RESERV"]
+
+    if work_category == "Leave":
+        work_type = ["LSL", "PL", "SBL"]
+
+    return work_type
+
+
+@app.route('/get_work', methods=['GET', 'POST'])
+@login_required
+def get_work():
+    work_id = request.form.get('work_id')
+    work = Work.query.filter_by(work_id=work_id).first()
+    rest = {
+        'work_id': work_id,
+        'dept_id': work.dept_id,
+        'work_explanation': work.work_explanation,
+        'work_type': work.work_type,
+        'unit_code': work.unit_code
+    }
+    return rest
+
+
+@app.route('/get_works', methods=['GET', 'POST'])
+@login_required
+def get_works():
+    works = Work.query.all()
+    rest = []
+    for item in works:
+        temp = {
+            'work_id': item.work_id,
+            'dept_id': item.dept_id,
+            'work_explanation': item.work_explanation,
+            'work_type': item.work_type,
+            'unit_code': item.unit_code
+        }
+        rest.append(temp)
+
+    return rest
+
+
+@app.route('/get_department', methods=['GET', 'POST'], endpoint="get_department_by_staff")
+@login_required
+def get_department():
+
+    dept_id = request.form.get('dept_id')
+    if dept_id is not None:
+        department = Department.query.filter_by(dept_id=dept_id).first()
+        rest = {
+            'dept_id': department.dept_id,
+            'dept_name': department.dept_name,
+        }
+        return rest
+
+    departments = Department.query.all()
+    rest = []
+    for item in departments:
+        temp = {
+            'dept_id': item.dept_id,
+            'dept_name': item.dept_name
+        }
+        rest.append(temp)
+    return rest
+
+
+@app.route('/get_user', methods=['GET', 'POST'])
+@login_required
+def get_user():
+    users = User.query.all()
+    rest = []
+    for item in users:
+        temp = {
+            'username': item.username,
+            'role_id': item.role_id,
+            'leave_hours': item.leave_hours,
+            'contract_hour': item.contract_hour,
+            'available_hours': item.available_hours,
+            'dept_id': item.dept_id,
+        }
+        rest.append(temp)
+    return rest
+
+
+@app.route('/set_workload_allocation', methods=['GET', 'POST'])
+@login_required
+def set_workload_allocation():
+    code = 0
+    msg = "Edit Error"
+    alloc_id = request.form.get('alloc_id')
+    hours_allocated = request.form.get('hours_allocated')
+    workload_point = request.form.get('workload_point')
+    if hours_allocated is None or hours_allocated == "":
+        rest = {'code': code, 'msg': "Adjusted Hours Is Required"}
+        return rest
+
+    if workload_point is None or workload_point == "":
+        rest = {'code': code, 'msg': "Adjusted Workload Point Is Required"}
+        return rest
+
+    workload = WorkloadAllocation.query.filter_by(alloc_id=alloc_id).first()
+    workload.hours_allocated = hours_allocated
+    workload.workload_point = workload_point
+
+    db.session.commit()
+    if workload:
+        code = 1
+        msg = "Edit successfully"
+
+    rest = {'code': code, 'msg': msg}
+    return rest
 
 
 def set_session(user):
@@ -110,6 +284,7 @@ def set_session(user):
     role = Role.query.filter_by(role_id=user_info.role_id).first()
     session['role_id'] = role.role_id
     session['role_name'] = role.role_name
+    session['username'] = user.username
 
 
 def get_session():
@@ -120,7 +295,111 @@ def get_session():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', title='Dashboard')
+    role_id = current_user.user.role_id
+    # if current user is admin(4) or hod(1), show all workload
+    if role_id == 4 or role_id == 1:
+        workloads = WorkloadAllocation.query.filter_by(
+            username=current_user.username).all()
+
+    # if current user is HoD(2), show only their department workload
+    elif role_id == 2:
+        workloads = WorkloadAllocation.query.join(Work, Work.work_id == WorkloadAllocation.work_id).filter(
+            Work.dept_id == current_user.user.dept_id).filter(WorkloadAllocation.username == current_user.username).all()
+
+    # if current user is staff(3), show only their workload
+    elif role_id == 3:
+        workloads = WorkloadAllocation.query.filter_by(
+            username=current_user.username).all()
+
+    deprest = Department.query.all()
+    departments = []
+    departments_value = []
+    for item in deprest:
+        value = 0
+        departments.append(item.dept_name)
+
+        works = Work.query.filter_by(dept_id=item.dept_id).all()
+        for subitem in works:
+            workallcation = WorkloadAllocation.query.filter_by(
+                work_id=subitem.work_id).filter_by(username=current_user.username).all()
+            for witem in workallcation:
+                value = value + witem.hours_allocated
+        departments_value.append(value)
+
+    all_work = Work.query.all()
+    work_type = []
+    work_type_value = []
+    work_category = []
+    work_category_value = []
+    for item in all_work:
+        if item.work_type not in work_type:
+            work_type.append(item.work_type)
+
+        if item.work_category not in work_category:
+            work_category.append(item.work_category)
+
+    for item in work_type:
+        value = 0
+        work = Work.query.filter_by(work_type=item).all()
+        for subitem in work:
+            workallcation = WorkloadAllocation.query.filter_by(
+                work_id=subitem.work_id).filter_by(username=current_user.username).all()
+            for witem in workallcation:
+                value = value + witem.hours_allocated
+        work_type_value.append(value)
+
+    work_type_data = []
+    i = 0
+    for item in work_type:
+        temp = {
+            'name': item,
+            'value': work_type_value[i]
+        }
+        work_type_data.append(temp)
+        i = i + 1
+
+    for item in work_category:
+        work_type = []
+        if item == "Service":
+            work_type = ["ADMIN", "GA", "SDS"]
+
+        if item == "Teaching":
+            work_type = ["CWS", "TEACH", "UDEV"]
+
+        if item == "Research":
+            work_type = ["HDR", "ORES", "RES-MGMT", "RESERV"]
+
+        if item == "Leave":
+            work_type = ["LSL", "PL", "SBL"]
+        value = 0
+        for subitem in work_type:
+            work = Work.query.filter_by(work_type=subitem).all()
+            for subitem in work:
+                workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).filter_by(
+                    username=current_user.username).all()
+                for witem in workallcation:
+                    value = value + witem.hours_allocated
+
+        work_category_value.append(value)
+
+    work_category_data = []
+    j = 0
+    for item in work_category:
+        temp = {
+            'name': item,
+            'value': work_category_value[j]
+        }
+        work_category_data.append(temp)
+        j = j + 1
+
+    return render_template('dashboard.html', title='Dashboard',
+                           username=current_user.username,
+                           workloads=workloads,
+                           departments=departments,
+                           departments_value=departments_value,
+                           work_type_data=work_type_data,
+                           work_category_data=work_category_data
+                           )
 
 
 # Single-line Assignment
@@ -268,6 +547,7 @@ def check_duplicate_task():
 # Upload function, including validate file type - MW
 ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'}  # MW
 
+
 @app.route("/upload", methods=["POST"])
 @login_required
 def upload_file():
@@ -408,7 +688,7 @@ def upload_file():
                     db.session.add(workload_allocation)
                     db.session.commit()
 
-            flash("File uploaded and data stored as TaskData objects successfully.")
+            flash("File uploaded and data updated successfully.")
             return redirect(url_for('assign'))
         except Exception as e:
             return f"Error: {str(e)}"

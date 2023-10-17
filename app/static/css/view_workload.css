@@ -84,3 +84,16 @@ th {
 }
 
 /* Additional styles can be added as needed */
+
+nav ul li{
+  margin-top: -4px;
+}
+
+nav ul li:first-child{
+  margin-top: 0;
+}
+
+nav ul li:last-child a{
+    padding: 5.5px 10px;
+}
+

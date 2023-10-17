@@ -8,35 +8,39 @@ body {
 header {
   height: 100px;
   background-color: rgb(40, 52, 139);
-  padding: 0 3px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between; /* Distribute the space between logo and nav links */
 }
 
 /* Reset the default padding and margin on the ul or body elements from either the browser's default styles or from Bootstrap's styles */
-body,
-ul {
-  margin: 0;
-  padding: 0;
-}
+/*body,*/
+/*ul {*/
+/*  margin: 0;*/
+/*  padding: 0;*/
+/*}*/
 
 nav {
-  width: 98%;
+  height: 86.73px;
 }
 
 .logo {
-  max-width: 180px;
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+  margin-right: 10px;
 }
 
 nav ul {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex: 1;
 }
 
 nav ul li {
-  margin: 0 10px;
+  margin: 0 20px;
   align-items: center; /* Align UWA logo with other elements in the nav bar */
   display: flex;
 }
@@ -58,8 +62,7 @@ nav ul li a:hover {
 
 /* last-child = login/logout button */
 nav ul li:last-child {
-  margin-left: auto;
-  width: 80px;
+  width: 200px;
   justify-content: flex-end;
 }
 
@@ -132,4 +135,26 @@ footer {
 .notification-alert .btn-close:hover {
   cursor: pointer;
   opacity: 0.5;
+}
+
+nav ul{
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+
+}
+
+footer p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
 }
