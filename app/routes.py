@@ -8,7 +8,8 @@ from openpyxl import load_workbook
 import re
 import random
 from flask import g
-
+from flask import session
+import uuid
 # decorator for login page
 
 
@@ -84,7 +85,15 @@ def view_all_workload():
 @app.route('/assign_workload')
 @login_required
 def assign():
-    return render_template('assign_workload.html', title='Assign Workload')
+    # Check if the currently logged-in user has a role_id of 3
+    if current_user.user.role_id == 3:
+        flash('You do not have permission to access this page.')
+        return redirect(url_for('dashboard'))
+
+    # Fetch all usernames from the User table
+    users = User.query.with_entities(User.username).all()
+    usernames = [user.username for user in users]
+    return render_template('assign_workload.html', title='Assign Workload', usernames=usernames)
 
 
 @app.route('/edit_allocation_detail')
@@ -93,15 +102,171 @@ def edit_allocation_detail():
     return render_template('edit_allocation_detail.html', title='Edit Allocation Detail')
 
 
+def set_session(user):
+    user_info = User.query.filter_by(username=user.username).first()
+    if user_info is None:
+        flash('Invalid Username or Password')
+        return redirect(url_for('login'))
+    role = Role.query.filter_by(role_id=user_info.role_id).first()
+    session['role_id'] = role.role_id
+    session['role_name'] = role.role_name
+
+
+def get_session():
+    role_name = session.get('role_name', '')
+    return role_name
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
     return render_template('dashboard.html', title='Dashboard')
 
 
+# Single-line Assignment
+@app.route("/getpoint", methods=["POST"])
+def get_point():
+    staff_id = request.form.get("staffId")
+
+    user = User.query.filter_by(username=staff_id).first()
+
+    if user:
+        contract_hour = user.contract_hour
+
+        return jsonify({"contract_hour": contract_hour})
+    else:
+        return jsonify({"message": "User not found"})
+
+
+@app.route('/assign', methods=['POST'])
+def assign_task():
+    try:
+        k_category = request.form.get("category")
+        k_taskType = request.form.get("taskType")
+        k_department = request.form.get("department")
+        k_work_id = request.form.get("staffId")
+        k_username = k_work_id
+        k_comment = request.form.get("explanation")
+        k_comment_status = ""
+        k_unit_code = request.form.get("unitCode")
+        k_hours_allocated = request.form.get("assignedHours")
+        k_workload_point = request.form.get("workPoint")
+
+        print("k_category: ")
+        print(k_category)
+        print("k_taskType: ")
+        print(k_taskType)
+        print("k_department: ")
+        print(k_department)
+        print("k_work_id: ")
+        print(k_work_id)
+        print("k_username: ")
+        print(k_username)
+        print("k_comment: ")
+        print(k_comment)
+        print("k_comment_status: ")
+        print(k_comment_status)
+        print("k_unit_code: ")
+        print(k_unit_code)
+        print("k_hours_allocated: ")
+        print(k_hours_allocated)
+        print("k_workload_point: ")
+        print(k_workload_point)
+
+        k_depart = Department.query.filter_by(dept_name=k_department).first()
+        print(k_depart)
+        k_dept_id = k_depart.dept_id
+        print(k_dept_id)
+
+        role_name = "HoS"
+        k_role = Role.query.filter_by(role_name=role_name).first()
+        k_role_id = k_role.role_id
+        print(k_role_id)
+
+        # #work
+        k_work_explanation = "Some explanation for " + k_taskType
+        k_work = Work(
+            work_explanation=k_comment,
+            work_type=k_taskType,
+            dept_id=int(k_dept_id),
+            unit_code=k_unit_code
+        )
+        #
+        db.session.add(k_work)
+        db.session.commit()
+
+        # #workload
+        k_workload_allocation = WorkloadAllocation(
+            work_id=k_work.work_id,
+            hours_allocated=float(k_hours_allocated),
+            username=int(k_username),
+            comment_status=k_comment_status,
+            workload_point=float(k_workload_point)
+        )
+
+        db.session.add(k_workload_allocation)
+        db.session.commit()
+        #
+
+        # user
+        k_contract_hour = float(k_workload_point) / float(k_hours_allocated)
+        k_user = User.query.filter_by(username=k_username).first()
+        k_user.leave_hours += float(k_hours_allocated)
+        db.session.add(k_user)
+        db.session.commit()
+
+        return "assigned and data stored successfully."
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def generate_int_id():
+    # Generate a UUID4 and convert it to an integer
+    uuid_str = str(uuid.uuid4()).replace('-', '')
+    int_id = int(uuid_str, 16)
+    int_id = int(str(int_id)[0:12])
+    return int_id
+
+
+@app.route("/get_department", methods=["POST"])
+def get_department():
+    staff_id = request.form.get("staffId")
+    user_info = User.query.filter_by(username=staff_id).first()
+    dept_info = Department.query.filter_by(dept_id=user_info.dept_id).first()
+    # Assuming you have retrieved the department as "department_name"
+    # Replace with your actual department retrieval logic
+    department_name = dept_info.dept_name
+    return jsonify({"department": department_name})
+
+
+@app.route('/check_duplicate_task', methods=['POST'])
+def check_duplicate_task():
+    try:
+        task_type = request.form.get("taskType")
+        department = request.form.get("department")
+        staff_id = request.form.get("staffId")
+        assigned_hours = request.form.get("assignedHours")
+        k_workload_point = request.form.get("workPoint")
+
+        is_duplicate = False
+
+        workloads = WorkloadAllocation.query.filter_by(
+            username=staff_id, hours_allocated=assigned_hours, workload_point=k_workload_point).all()
+        for item in workloads:
+            k_depart = Department.query.filter_by(dept_name=department).first()
+            works = Work.query.filter_by(
+                work_id=item.work_id, work_type=task_type, dept_id=k_depart.dept_id).all()
+            if len(works) != 0:
+                is_duplicate = True
+                break
+        print(is_duplicate)
+        return jsonify({"is_duplicate": is_duplicate})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
 # Upload function, including validate file type - MW
 ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'}  # MW
-
 
 @app.route("/upload", methods=["POST"])
 @login_required
