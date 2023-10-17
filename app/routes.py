@@ -118,12 +118,12 @@ def edit_allocation_detail():
         info = WorkloadAllocation.query.filter_by(alloc_id=alloc_id).first()
         info.comment = comment
 
-        #update comment status to unread
+        # update comment status to unread
         info.comment_status = "Unread"
-        
+
         db.session.commit()
         if info:
-            msg = 'Comment Success'
+            msg = 'Comment successfully'
         rest = {'code': code, 'msg': msg}
         return rest
 
@@ -146,7 +146,8 @@ def edit_allocation_detail():
 
     data = None
     if request.args.get('alloc_id') is not None:
-        data = WorkloadAllocation.query.filter_by(alloc_id=request.args.get('alloc_id')).first()
+        data = WorkloadAllocation.query.filter_by(
+            alloc_id=request.args.get('alloc_id')).first()
     return render_template('edit_allocation_detail.html', title='Edit Allocation Detail', role_name=role_name,
                            workloads=workloads, user=user, data=data)
 
@@ -204,7 +205,7 @@ def get_works():
     return rest
 
 
-@app.route('/get_department', methods=['GET', 'POST'],endpoint="get_department_by_staff")
+@app.route('/get_department', methods=['GET', 'POST'], endpoint="get_department_by_staff")
 @login_required
 def get_department():
 
@@ -291,15 +292,14 @@ def get_session():
     return role_name
 
 
-
-
 @app.route('/dashboard')
 @login_required
 def dashboard():
     role_id = current_user.user.role_id
     # if current user is admin(4) or hod(1), show all workload
     if role_id == 4 or role_id == 1:
-        workloads = WorkloadAllocation.query.filter_by(username=current_user.username).all()
+        workloads = WorkloadAllocation.query.filter_by(
+            username=current_user.username).all()
 
     # if current user is HoD(2), show only their department workload
     elif role_id == 2:
@@ -311,7 +311,6 @@ def dashboard():
         workloads = WorkloadAllocation.query.filter_by(
             username=current_user.username).all()
 
-
     deprest = Department.query.all()
     departments = []
     departments_value = []
@@ -321,7 +320,8 @@ def dashboard():
 
         works = Work.query.filter_by(dept_id=item.dept_id).all()
         for subitem in works:
-            workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).filter_by(username=current_user.username).all()
+            workallcation = WorkloadAllocation.query.filter_by(
+                work_id=subitem.work_id).filter_by(username=current_user.username).all()
             for witem in workallcation:
                 value = value + witem.hours_allocated
         departments_value.append(value)
@@ -342,7 +342,8 @@ def dashboard():
         value = 0
         work = Work.query.filter_by(work_type=item).all()
         for subitem in work:
-            workallcation = WorkloadAllocation.query.filter_by(work_id=subitem.work_id).filter_by(username=current_user.username).all()
+            workallcation = WorkloadAllocation.query.filter_by(
+                work_id=subitem.work_id).filter_by(username=current_user.username).all()
             for witem in workallcation:
                 value = value + witem.hours_allocated
         work_type_value.append(value)
@@ -390,8 +391,6 @@ def dashboard():
         }
         work_category_data.append(temp)
         j = j + 1
-
-
 
     return render_template('dashboard.html', title='Dashboard',
                            username=current_user.username,
@@ -548,6 +547,7 @@ def check_duplicate_task():
 # Upload function, including validate file type - MW
 ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'}  # MW
 
+
 @app.route("/upload", methods=["POST"])
 @login_required
 def upload_file():
@@ -688,7 +688,7 @@ def upload_file():
                     db.session.add(workload_allocation)
                     db.session.commit()
 
-            flash("File uploaded and data stored as TaskData objects successfully.")
+            flash("File uploaded and data updated successfully.")
             return redirect(url_for('assign'))
         except Exception as e:
             return f"Error: {str(e)}"
