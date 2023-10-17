@@ -221,7 +221,7 @@ def upload_file():
                     ]
 
                     if item['Type'] in typeArr:
-                        user.leave_hours = hours_allocated
+                        user.leave_hours += hours_allocated
                         db.session.commit()
 
                     username = item['Staff Number']
