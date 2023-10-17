@@ -1,9 +1,10 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login, User, WorkloadAllocation, Role, Work
+from app.models import Login, User, WorkloadAllocation, Role, Work, Department
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
+from openpyxl import load_workbook
 import re
 import random
 from flask import g
@@ -96,6 +97,159 @@ def edit_allocation_detail():
 @login_required
 def dashboard():
     return render_template('dashboard.html', title='Dashboard')
+
+
+# Upload function, including validate file type - MW
+ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'}  # MW
+
+
+@app.route("/upload", methods=["POST"])
+@login_required
+def upload_file():
+    role_id = current_user.user.role_id
+    role = Role.query.filter_by(role_id=role_id).first()
+    if role.role_name == "Staff":
+        flash('Staff cannot use')
+        return redirect(url_for('assign'))
+
+    file = request.files["file"]
+    file_extension = file.filename.rsplit(
+        '.', 1)[1].lower() if '.' in file.filename else ''  # MW
+
+    if file_extension not in ALLOWED_EXTENSIONS:  # MW
+        # return "Invalid file type. Please upload a valid Excel file." #MW
+        flash('Invalid file type, please upload again')  # MW
+        return redirect(url_for('assign'))  # mw
+
+    if file.filename != "":
+        try:
+
+            sheetname = 'Work Assignment'
+            workbook = load_workbook(file, read_only=False, data_only=True)
+            sheet = workbook[sheetname]
+
+            sheet_title = sheet.title
+
+            if sheet_title != sheetname:
+                # return "This may not be the right spreadsheet as it does not pass the content validation."
+                flash('Invalid spreedsheet, please upload again')
+                return redirect(url_for('assign'))
+
+            data = []
+            for row in sheet.iter_rows():
+                row_data = []
+                for cell in row:
+                    row_data.append(cell.value)
+                data.append(row_data)
+
+            workbook.close()
+            keys = [
+                "Staff Number",
+                "Type",
+                "Department",
+                "Unit Code",
+                "Explanation",
+                "Assigned Hours",
+            ]
+
+            rest = []
+
+            for item in data[1:]:
+                temp = dict(zip(keys, item))
+                rest.append(temp)
+
+            for item in rest:
+                if item['Staff Number'] is None:
+                    continue
+
+                if item['Department'] is None:
+                    continue
+
+                user = User.query.filter_by(
+                    username=item['Staff Number']).first()
+                if user is None:
+                    flash("User {} does not exist.  All workloads before the invalid entry have been successfully assigned.".format(
+                        item['Staff Number']))
+                    return redirect(url_for('assign'))
+
+                if user.contract_hour is None or user.contract_hour == 0:
+                    flash("User {} contract_hour is empty.".format(
+                        item['Staff Number']))
+                    return redirect(url_for('assign'))
+
+                dept = Department.query.filter_by(
+                    dept_name=item['Department']).first()
+                if dept is None:
+                    flash("Department {} does not exist.".format(
+                        item['Department']))
+                    return redirect(url_for('assign'))
+
+                # data insert work
+                if item['Unit Code'] is not None:
+                    work_explanation = item['Explanation']
+                    work_type = item['Type']
+                    dept_id = dept.dept_id
+                    unit_code = item['Unit Code']
+
+                    work = Work.query.filter_by(
+                        work_explanation=work_explanation,
+                        work_type=work_type,
+                        dept_id=dept_id,
+                        unit_code=unit_code,
+                    ).first()
+
+                    if work is None:
+                        work = Work(
+                            work_explanation=work_explanation,
+                            work_type=work_type,
+                            dept_id=dept_id,
+                            unit_code=unit_code,
+                        )
+                        db.session.add(work)
+                        db.session.commit()
+
+                    # data insert workload_allocation
+                    work_id = work.work_id
+                    hours_allocated = 0
+                    if item['Assigned Hours'] is not None:
+                        hours_allocated = item['Assigned Hours']
+
+                    typeArr = [
+                        "PL",
+                        "SBL",
+                        "LSL",
+                    ]
+
+                    if item['Type'] in typeArr:
+                        user.leave_hours += hours_allocated
+                        db.session.commit()
+
+                    username = item['Staff Number']
+                    comment = ''
+                    comment_status = ''
+                    workload_point = 0
+                    if hours_allocated != 0:
+                        workload_point = round(
+                            float(hours_allocated) / user.contract_hour, 2)
+
+                    workload_allocation = WorkloadAllocation(
+                        work_id=work_id,
+                        hours_allocated=hours_allocated,
+                        username=username,
+                        comment=comment,
+                        comment_status=comment_status,
+                        workload_point=workload_point,
+                    )
+                    db.session.add(workload_allocation)
+                    db.session.commit()
+
+            flash("File uploaded and data stored as TaskData objects successfully.")
+            return redirect(url_for('assign'))
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    flash("No file selected for upload.")
+    return redirect(url_for('assign'))
 
 
 @app.route('/comment_history')
