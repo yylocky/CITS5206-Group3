@@ -168,7 +168,7 @@ def upload_file():
                 user = User.query.filter_by(
                     username=item['Staff Number']).first()
                 if user is None:
-                    flash("User {} does not exist.".format(
+                    flash("User {} does not exist.  All workloads before the invalid entry have been successfully assigned.".format(
                         item['Staff Number']))
                     return redirect(url_for('assign'))
 
