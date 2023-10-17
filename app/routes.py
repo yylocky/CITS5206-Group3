@@ -204,7 +204,7 @@ def get_works():
     return rest
 
 
-@app.route('/get_department', methods=['GET', 'POST'])
+@app.route('/get_department', methods=['GET', 'POST'],endpoint="get_department_by_staff")
 @login_required
 def get_department():
 
