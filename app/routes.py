@@ -291,19 +291,6 @@ def get_session():
     return role_name
 
 
-def set_session(user):
-    user_info = User.query.filter_by(username=user.username).first()
-    if user_info is None:
-        flash('Invalid Username or Password')
-        return redirect(url_for('login'))
-    role = Role.query.filter_by(role_id=user_info.role_id).first()
-    session['role_id'] = role.role_id
-    session['role_name'] = role.role_name
-
-
-def get_session():
-    role_name = session.get('role_name', '')
-    return role_name
 
 
 @app.route('/dashboard')
