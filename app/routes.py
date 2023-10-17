@@ -1,14 +1,17 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db, forms
-from app.models import Login, User, WorkloadAllocation, Role, Work
+from app.models import Login, User, WorkloadAllocation, Role, Work, Department
 from app.forms import LoginForm, SignupForm
 from werkzeug.urls import url_parse
+from openpyxl import load_workbook
 import re
 import random
 from flask import g
 from flask import session
-from app.models import Department
+
+import uuid
+
 # decorator for login page
 
 
@@ -86,7 +89,15 @@ def view_all_workload():
 @app.route('/assign_workload')
 @login_required
 def assign():
-    return render_template('assign_workload.html', title='Assign Workload')
+    # Check if the currently logged-in user has a role_id of 3
+    if current_user.user.role_id == 3:
+        flash('You do not have permission to access this page.')
+        return redirect(url_for('dashboard'))
+
+    # Fetch all usernames from the User table
+    users = User.query.with_entities(User.username).all()
+    usernames = [user.username for user in users]
+    return render_template('assign_workload.html', title='Assign Workload', usernames=usernames)
 
 
 @app.route('/edit_allocation_detail', methods=['GET', 'POST'])
@@ -279,6 +290,21 @@ def get_session():
     return role_name
 
 
+def set_session(user):
+    user_info = User.query.filter_by(username=user.username).first()
+    if user_info is None:
+        flash('Invalid Username or Password')
+        return redirect(url_for('login'))
+    role = Role.query.filter_by(role_id=user_info.role_id).first()
+    session['role_id'] = role.role_id
+    session['role_name'] = role.role_name
+
+
+def get_session():
+    role_name = session.get('role_name', '')
+    return role_name
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -387,6 +413,300 @@ def dashboard():
                            work_type_data=work_type_data,
                            work_category_data=work_category_data
                            )
+
+
+# Single-line Assignment
+@app.route("/getpoint", methods=["POST"])
+def get_point():
+    staff_id = request.form.get("staffId")
+
+    user = User.query.filter_by(username=staff_id).first()
+
+    if user:
+        contract_hour = user.contract_hour
+
+        return jsonify({"contract_hour": contract_hour})
+    else:
+        return jsonify({"message": "User not found"})
+
+
+@app.route('/assign', methods=['POST'])
+def assign_task():
+    try:
+        k_category = request.form.get("category")
+        k_taskType = request.form.get("taskType")
+        k_department = request.form.get("department")
+        k_work_id = request.form.get("staffId")
+        k_username = k_work_id
+        k_comment = request.form.get("explanation")
+        k_comment_status = ""
+        k_unit_code = request.form.get("unitCode")
+        k_hours_allocated = request.form.get("assignedHours")
+        k_workload_point = request.form.get("workPoint")
+
+        print("k_category: ")
+        print(k_category)
+        print("k_taskType: ")
+        print(k_taskType)
+        print("k_department: ")
+        print(k_department)
+        print("k_work_id: ")
+        print(k_work_id)
+        print("k_username: ")
+        print(k_username)
+        print("k_comment: ")
+        print(k_comment)
+        print("k_comment_status: ")
+        print(k_comment_status)
+        print("k_unit_code: ")
+        print(k_unit_code)
+        print("k_hours_allocated: ")
+        print(k_hours_allocated)
+        print("k_workload_point: ")
+        print(k_workload_point)
+
+        k_depart = Department.query.filter_by(dept_name=k_department).first()
+        print(k_depart)
+        k_dept_id = k_depart.dept_id
+        print(k_dept_id)
+
+        role_name = "HoS"
+        k_role = Role.query.filter_by(role_name=role_name).first()
+        k_role_id = k_role.role_id
+        print(k_role_id)
+
+        # #work
+        k_work_explanation = "Some explanation for " + k_taskType
+        k_work = Work(
+            work_explanation=k_comment,
+            work_type=k_taskType,
+            dept_id=int(k_dept_id),
+            unit_code=k_unit_code
+        )
+        #
+        db.session.add(k_work)
+        db.session.commit()
+
+        # #workload
+        k_workload_allocation = WorkloadAllocation(
+            work_id=k_work.work_id,
+            hours_allocated=float(k_hours_allocated),
+            username=int(k_username),
+            comment_status=k_comment_status,
+            workload_point=float(k_workload_point)
+        )
+
+        db.session.add(k_workload_allocation)
+        db.session.commit()
+        #
+
+        # user
+        k_contract_hour = float(k_workload_point) / float(k_hours_allocated)
+        k_user = User.query.filter_by(username=k_username).first()
+        k_user.leave_hours += float(k_hours_allocated)
+        db.session.add(k_user)
+        db.session.commit()
+
+        return "assigned and data stored successfully."
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def generate_int_id():
+    # Generate a UUID4 and convert it to an integer
+    uuid_str = str(uuid.uuid4()).replace('-', '')
+    int_id = int(uuid_str, 16)
+    int_id = int(str(int_id)[0:12])
+    return int_id
+
+
+@app.route("/get_department", methods=["POST"])
+def get_department():
+    staff_id = request.form.get("staffId")
+    user_info = User.query.filter_by(username=staff_id).first()
+    dept_info = Department.query.filter_by(dept_id=user_info.dept_id).first()
+    # Assuming you have retrieved the department as "department_name"
+    # Replace with your actual department retrieval logic
+    department_name = dept_info.dept_name
+    return jsonify({"department": department_name})
+
+
+@app.route('/check_duplicate_task', methods=['POST'])
+def check_duplicate_task():
+    try:
+        task_type = request.form.get("taskType")
+        department = request.form.get("department")
+        staff_id = request.form.get("staffId")
+        assigned_hours = request.form.get("assignedHours")
+        k_workload_point = request.form.get("workPoint")
+
+        is_duplicate = False
+
+        workloads = WorkloadAllocation.query.filter_by(
+            username=staff_id, hours_allocated=assigned_hours, workload_point=k_workload_point).all()
+        for item in workloads:
+            k_depart = Department.query.filter_by(dept_name=department).first()
+            works = Work.query.filter_by(
+                work_id=item.work_id, work_type=task_type, dept_id=k_depart.dept_id).all()
+            if len(works) != 0:
+                is_duplicate = True
+                break
+        print(is_duplicate)
+        return jsonify({"is_duplicate": is_duplicate})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+
+# Upload function, including validate file type - MW
+ALLOWED_EXTENSIONS = {'xlsx', 'xls', 'csv', 'tsv'}  # MW
+
+@app.route("/upload", methods=["POST"])
+@login_required
+def upload_file():
+    role_id = current_user.user.role_id
+    role = Role.query.filter_by(role_id=role_id).first()
+    if role.role_name == "Staff":
+        flash('Staff cannot use')
+        return redirect(url_for('assign'))
+
+    file = request.files["file"]
+    file_extension = file.filename.rsplit(
+        '.', 1)[1].lower() if '.' in file.filename else ''  # MW
+
+    if file_extension not in ALLOWED_EXTENSIONS:  # MW
+        # return "Invalid file type. Please upload a valid Excel file." #MW
+        flash('Invalid file type, please upload again')  # MW
+        return redirect(url_for('assign'))  # mw
+
+    if file.filename != "":
+        try:
+
+            sheetname = 'Work Assignment'
+            workbook = load_workbook(file, read_only=False, data_only=True)
+            sheet = workbook[sheetname]
+
+            sheet_title = sheet.title
+
+            if sheet_title != sheetname:
+                # return "This may not be the right spreadsheet as it does not pass the content validation."
+                flash('Invalid spreedsheet, please upload again')
+                return redirect(url_for('assign'))
+
+            data = []
+            for row in sheet.iter_rows():
+                row_data = []
+                for cell in row:
+                    row_data.append(cell.value)
+                data.append(row_data)
+
+            workbook.close()
+            keys = [
+                "Staff Number",
+                "Type",
+                "Department",
+                "Unit Code",
+                "Explanation",
+                "Assigned Hours",
+            ]
+
+            rest = []
+
+            for item in data[1:]:
+                temp = dict(zip(keys, item))
+                rest.append(temp)
+
+            for item in rest:
+                if item['Staff Number'] is None:
+                    continue
+
+                if item['Department'] is None:
+                    continue
+
+                user = User.query.filter_by(
+                    username=item['Staff Number']).first()
+                if user is None:
+                    flash("User {} does not exist.  All workloads before the invalid entry have been successfully assigned.".format(
+                        item['Staff Number']))
+                    return redirect(url_for('assign'))
+
+                if user.contract_hour is None or user.contract_hour == 0:
+                    flash("User {} contract_hour is empty.".format(
+                        item['Staff Number']))
+                    return redirect(url_for('assign'))
+
+                dept = Department.query.filter_by(
+                    dept_name=item['Department']).first()
+                if dept is None:
+                    flash("Department {} does not exist.".format(
+                        item['Department']))
+                    return redirect(url_for('assign'))
+
+                # data insert work
+                if item['Unit Code'] is not None:
+                    work_explanation = item['Explanation']
+                    work_type = item['Type']
+                    dept_id = dept.dept_id
+                    unit_code = item['Unit Code']
+
+                    work = Work.query.filter_by(
+                        work_explanation=work_explanation,
+                        work_type=work_type,
+                        dept_id=dept_id,
+                        unit_code=unit_code,
+                    ).first()
+
+                    if work is None:
+                        work = Work(
+                            work_explanation=work_explanation,
+                            work_type=work_type,
+                            dept_id=dept_id,
+                            unit_code=unit_code,
+                        )
+                        db.session.add(work)
+                        db.session.commit()
+
+                    # data insert workload_allocation
+                    work_id = work.work_id
+                    hours_allocated = 0
+                    if item['Assigned Hours'] is not None:
+                        hours_allocated = item['Assigned Hours']
+
+                    typeArr = [
+                        "PL",
+                        "SBL",
+                        "LSL",
+                    ]
+
+                    if item['Type'] in typeArr:
+                        user.leave_hours += hours_allocated
+                        db.session.commit()
+
+                    username = item['Staff Number']
+                    comment = ''
+                    comment_status = ''
+                    workload_point = 0
+                    if hours_allocated != 0:
+                        workload_point = round(
+                            float(hours_allocated) / user.contract_hour, 2)
+
+                    workload_allocation = WorkloadAllocation(
+                        work_id=work_id,
+                        hours_allocated=hours_allocated,
+                        username=username,
+                        comment=comment,
+                        comment_status=comment_status,
+                        workload_point=workload_point,
+                    )
+                    db.session.add(workload_allocation)
+                    db.session.commit()
+
+            flash("File uploaded and data stored as TaskData objects successfully.")
+            return redirect(url_for('assign'))
+        except Exception as e:
+            return f"Error: {str(e)}"
+
+    flash("No file selected for upload.")
+    return redirect(url_for('assign'))
 
 
 @app.route('/comment_history')
