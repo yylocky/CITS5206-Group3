@@ -145,7 +145,7 @@ def assign_task():
         k_work_id = request.form.get("staffId")
         k_username = k_work_id
         k_comment = request.form.get("explanation")
-        k_comment_status = "Unread"
+        k_comment_status = ""
         k_unit_code = request.form.get("unitCode")
         k_hours_allocated = request.form.get("assignedHours")
         k_workload_point = request.form.get("workPoint")
@@ -209,7 +209,7 @@ def assign_task():
         # user
         k_contract_hour = float(k_workload_point) / float(k_hours_allocated)
         k_user = User.query.filter_by(username=k_username).first()
-        k_user.leave_hours = k_hours_allocated
+        k_user.leave_hours += float(k_hours_allocated)
         db.session.add(k_user)
         db.session.commit()
 
