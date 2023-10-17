@@ -106,6 +106,10 @@ def edit_allocation_detail():
 
         info = WorkloadAllocation.query.filter_by(alloc_id=alloc_id).first()
         info.comment = comment
+
+        #update comment status to unread
+        info.comment_status = "Unread"
+        
         db.session.commit()
         if info:
             msg = 'Comment Success'
