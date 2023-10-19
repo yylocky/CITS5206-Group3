@@ -136,10 +136,10 @@ body {
     margin-top: 20px;
   }
 
- /* 修改 "upload" 按钮的颜色 */
-.uploadRow button {
-  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
-  color: white; /* 新的文字颜色 */
+ /* Change the color of the "upload" button */
+ .uploadRow button {
+  background-color: rgb(40, 52, 139); /* New background color */
+  color: white; /* New text color */
   border: none;
 }
 
@@ -147,10 +147,10 @@ body {
   background-color: rgb(40, 52, 139);
 }
 
-/* 修改 "download" 按钮的颜色 */
+/* Change the color of the "download" button */
 .downloadRow button {
-  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
-  color: white; /* 新的文字颜色 */
+  background-color: rgb(40, 52, 139); /* New background color */
+  color: white; /* New text color */
   border: none;
 }
 
@@ -158,13 +158,36 @@ body {
   background-color: rgb(40, 52, 139);
 }
 
-/* 修改 "assign" 按钮的颜色 */
+/* Change the color of the "assign" button */
 .assignmentRow button {
-  background-color: rgb(40, 52, 139); /* 新的背景颜色 */
-  color: white; /* 新的文字颜色 */
+  background-color: rgb(40, 52, 139); /* New background color */
+  color: white; /* New text color */
   border: none;
 }
 
+
 .assignmentRow button:hover {
   background-color: rgb(40, 52, 139);
+}
+
+nav ul{
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+
+}
+
+nav ul li{
+  margin-top: 3px;
+}
+
+nav ul li:first-child{
+  margin-top: 0;
 }

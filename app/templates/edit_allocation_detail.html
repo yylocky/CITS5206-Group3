@@ -1,180 +1,272 @@
-{% extends "base.html" %} {% block title %} Sign Up | My Dating Website {%
-endblock %} {% block styles %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/base.css') }}"
-/>
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/edit_allocation_detail.css') }}"
-/>
-{% endblock %} {% block content %}
-<div class="container">
-  <h1>Edit Workload</h1>
-</div>
+{% extends "base.html" %}
+{% block title %} Workload edit allocation detail page {% endblock %}
+{% block styles %}
+    <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/base.css') }}"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_allocation_detail.css') }}"/>
+    <style>
+        nav ul li {
+            margin-top: -4px;
+        }
 
-<div class="container">
-  <table class="table table-hover">
-    <thead>
-      <thead>
-        <tr>
-          <th scope="col">Department</th>
-          <th scope="col">Staff</th>
-          <th scope="col">Task</th>
-          <th scope="col">Assigned Hours</th>
-          <th scope="col">Adjusted Hours</th>
-        </tr>
-      </thead>
-    </thead>
-    <tbody>
-      <tr>
-        <th scope="col">
-          <!-- <label for="department" class="form-label">Department</label> -->
-          <select class="form-select" id="department">
-            {% for dept in ["CSSE", "M&S", "Physics"] %}
-            <option value="{{ dept }}">{{ dept }}</option>
-            {% endfor %}
-            <!-- 
-                      For MySQL data fetching:
-                      {% for dept in departments_from_database %}
-                      <option value="{{ dept.id }}">{{ dept.name }}</option>
-                      {% endfor %}
-                      -->
-          </select>
-        </th>
-        <th scope="col">
-          <!-- <label for="staffName" class="form-label">Staff Name</label> -->
-          <select class="form-select" id="staffName">
-            <option value="Mary">Mary</option>
-            <option value="Tom">Tom</option>
-            <option value="John">John</option>
-          </select>
-        </th>
-        <th scope="col">
-          <!-- <label for="taskType" class="form-label">Task Type</label> -->
-          <select class="form-select" id="taskType">
-            {% for task in ["Uni Coordination", "Project Supervision",
-            "Administration"] %}
-            <option value="{{ task }}">{{ task }}</option>
-            {% endfor %}
-          </select>
-        </th>
-        <th scope="col">20</th>
-        <!-- need to fetch current allocation from DB-->
-        <th scope="col">
-          <!-- <label for="assignedHours" class="form-label">Assigned Hours</label> -->
-          <input type="text" class="form-control" id="assignedHours" />
-
-          <!-- <small class="form-text text-danger" style="display: none"
-            >Invalid input</small
-          > -->
-        </th>
-      </tr>
-      <tr></tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="container">
-  <button class="btn btn-primary me-2">Modify</button>
-  <!-- <button
-    class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
-    onclick="addAssignmentRow()"
-  >
-    Add Modification
-  </button> -->
-</div>
-
-<div class="container">
-  <div class="mb-6">
-    <!-- <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label> -->
-    <textarea
-      class="form-control"
-      id="exampleFormControlTextarea1"
-      rows="3"
-    ></textarea>
-  </div>
-  <button class="btn btn-primary me-2">Send Comment</button>
-</div>
-
-<script>
-  let asgNumber = 1;
-
-  function addAssignmentRow() {
-    // Increment the assignment number
-    asgNumber += 1;
-
-    // Define the new row's HTML content
-    let newRowHTML = `
-    <div class="row mt-2 assignmentRow">
-      <div class="col-2">
-        Assignment ${asgNumber}
-      </div>
-      <div class="col">
-        <select class="form-select" id="department">
-          {% for dept in ["CSSE", "M&S", "Physics"] %}
-          <option value="{{ dept }}">{{ dept }}</option>
-          {% endfor %}
-          <!-- 
-          For MySQL data fetching:
-          {% for dept in departments_from_database %}
-          <option value="{{ dept.id }}">{{ dept.name }}</option>
-          {% endfor %}
-          -->
-        </select>
-      </div>
-      <div class="col-2">
-        <select class="form-select" id="taskType">
-          {% for task in ["Uni Coordination", "Project Supervision",
-          "Administration"] %}
-          <option value="{{ task }}">{{ task }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-2">
-        <input type="text" class="form-control" id="taskName" required />
-        <small class="form-text text-danger" style="display: none"
-          >Invalid input</small
-        >
-      </div>
-      <div class="col">
-        <select class="form-select" id="staffName">
-          <option value="Mary">Mary</option>
-          <option value="Tom">Tom</option>
-          <option value="John">John</option>
-        </select>
-      </div>
-      <div class="col-2">
-        <input
-          type="text"
-          class="form-control"
-          id="assignedHours"
-        />
-        <small class="form-text text-danger" style="display: none"
-          >Invalid input</small
-        >
-      </div>
-      <div class="col d-flex align-items-end">
-        <button class="btn btn-primary me-2">Assign</button>
-        <button class="btn btn-danger me-2" onclick="removeAsgRow(this)">
-          Remove
-        </button>
-      </div>
+        #assignedHours {
+            width: 90%;
+        }
+        input, select {
+            min-width: 105px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>Edit Workload</h1>
     </div>
-  `;
 
-    // Get the last assignment row
-    let assignmentRows = document.querySelectorAll(".assignmentRow");
-    let lastRow = assignmentRows[assignmentRows.length - 1];
+    <div class="container">
+        <form id="workload_allocation">
+            <table class="table table-hover">
+                <thead>
+                <thead>
+                <tr>
+                    <th class="sortable">Category <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Task Type <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Department <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Unit Code <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Staff Number <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Explanation <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Assigned Hours <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Adjusted Hours <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Workload Point <i class="fas fa-sort"></i></th>
+                    <th class="sortable">Adjusted Workload Point <i class="fas fa-sort"></i></th>
+                </tr>
+                </thead>
+                </thead>
+                <tbody>
+                <tr>
+                    <td scope="col">
+                        <span>
+                            {% for workload in workloads %}
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.work_category }}
+                                    <input type="hidden"
+                                           name="work_category"
+                                           id="work_category"
+                                           value="{{ workload.work.work_category }}"
+                                           data-hoursallocated="{{ data.hours_allocated }}"
+                                    >
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td scope="col">
+                        <span>
+                            {% for workload in workloads %}
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.work_type }}
+                                    <input type="hidden"
+                                           name="work_type"
+                                           id="work_type"
+                                           value="{{ workload.work.work_type }}"
+                                           data-deptid="{{ workload.work.dept_id }}"
+                                    >
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td scope="col">
+                        <span id="department"></span>
+                    </td>
+                    <td scope="col">
+                        <span>
+                            {% for workload in workloads %}
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.unit_code }}
+                                    <input type="hidden"
+                                           name="unit_code"
+                                           id="unit_code"
+                                           value="{{ workload.work.unit_code }}"
+                                    >
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td scope="col">
+                        <span>{{ data.username }}</span>
+                        <input type="hidden"
+                               name="username"
+                               id="username"
+                               value="{{ data.username }}"
+                        >
+                    </td>
+                    <td scope="col">
+                        <span>
+                            {% for workload in workloads %}
+                                {% if data.alloc_id == workload.alloc_id %}
+                                    {{ workload.work.work_explanation }}
+                                    <input type="hidden"
+                                           name="work_explanation"
+                                           id="work_explanation"
+                                           value="{{ workload.work.work_explanation }}"
+                                    >
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
 
-    // Add the new row below the last row
-    lastRow.insertAdjacentHTML("afterend", newRowHTML);
-  }
+                    <th scope="col">
+                        <span id="AssignedHours"></span>
+                    </th>
 
-  function removeAsgRow(btnElement) {
-    asgNumber -= 1;
-    let row = btnElement.closest(".row");
-    row.remove();
-  }
-</script>
+                    <th scope="col">
+                        <input type="text" style="width: auto;" class="form-control" id="AdjustedHours"
+                               name="hours_allocated" value=""/>
+                        <input type="hidden" name="alloc_id" id="alloc_id" value="{{ data.alloc_id }}"/>
+                        <input type="hidden" name="work_id" id="work_id" value=""/>
+                        <input type="hidden" name="workload_point" class="workload_point" value=""/>
+                    </th>
+
+
+                    <th scope="col">
+                        <span id="workload_point"></span>
+                    </th>
+
+                    <th scope="col">
+                        <span id="Adjusted_workload_point"></span>
+                    </th>
+                </tr>
+                <tr></tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    {% if role_name == 'HoS' or role_name == 'HoD' or role_name == 'Admin' %}
+        <div class="container">
+            <button class="btn btn-primary me-2" id="modify">Edit</button>
+            <!-- <button
+              class="btn btn-secondary mt-3 d-grid gap-2 col-6 mx-auto"
+              onclick="addAssignmentRow()"
+            >
+              Add Modification
+            </button> -->
+        </div>
+    {% endif %}
+    <form action="" method="post">
+        <div class="container">
+            <div class="mb-6">
+                <!-- <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label> -->
+                <textarea
+                        class="form-control"
+                        id="exampleFormControlTextarea1"
+                        rows="3"
+                        name="comment"
+                        required
+                ></textarea>
+            </div>
+            <button class="btn btn-primary me-2 send-comment" type="button">Send Comment</button>
+        </div>
+    </form>
+
+    <script src="../static/js/jquery.min.js"></script>
+    <script>
+
+        function removeAsgRow(btnElement) {
+            asgNumber -= 1;
+            let row = btnElement.closest(".row");
+            row.remove();
+        }
+
+        $("#work_category").change(function () {
+            var work_category = $(this).val();
+            initData(work_category);
+        })
+
+
+        var work_category = $("#work_category").val();
+        initData(work_category);
+
+
+        $("#AdjustedHours").change(function () {
+            var hours_allocated = $(this).val();
+
+            hours_allocated = parseFloat(hours_allocated);
+
+            var workload_point = {{ user.contract_hour }};
+
+            workload_point = hours_allocated / workload_point
+            $("#Adjusted_workload_point").html(workload_point.toFixed(2));
+            $(".workload_point").val(workload_point.toFixed(2));
+
+        })
+
+        function initData(work_category) {
+            var hours_allocated = $("#work_category").data('hoursallocated');
+            $("#AssignedHours").html(hours_allocated);
+
+            hours_allocated = parseFloat(hours_allocated);
+
+            var workload_point = {{ user.contract_hour }};
+
+            workload_point = hours_allocated / workload_point
+            $("#workload_point").html(workload_point.toFixed(2));
+
+            get_department();
+        }
+
+        function get_department() {
+            var dept_id = $("#work_type").data('deptid');
+            console.log(dept_id);
+            $.ajax({
+                type: 'post',
+                url: '/get_department',
+                data: {dept_id: dept_id},
+                success: function (res) {
+                    $("#department").html(res.dept_name);
+                }
+            })
+        }
+
+        $("#modify").click(function () {
+            var post = $("#workload_allocation").serialize();
+            var assignedHours = $("#assignedHours").val();
+            if (assignedHours == "") {
+                return false;
+            }
+            $.ajax({
+                type: 'post',
+                url: '/set_workload_allocation',
+                data: post,
+                success: function (res) {
+                    alert(res.msg);
+                }
+            })
+        })
+
+        // save comments
+        $(".send-comment").click(function (){
+            var alloc_id = $("#alloc_id").val();
+            var comment = $("#exampleFormControlTextarea1").val();
+            if(comment == ""){
+                alert("comment is required");
+                return false;
+            }
+
+            var post = {
+                alloc_id: alloc_id,
+                comment: comment,
+            }
+            $.ajax({
+                type: 'post',
+                url: '/edit_allocation_detail',
+                data: post,
+                success: function (res) {
+                    alert(res.msg);
+                }
+            })
+
+        })
+
+
+    </script>
 {% endblock %}

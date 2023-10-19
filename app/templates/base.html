@@ -44,13 +44,6 @@
               >Assign Workload</a
             >
           </li>
-          <li>
-            <a
-              href="/edit_allocation_detail"
-              class="{{ 'active' if request.endpoint == 'edit_allocation_detail' }}"
-              >Edit Workload</a
-            >
-          </li>
           <!-- The nav link for Comment History is only displayed to HoD users -->
           {% if g.is_hod %}
           <li>
