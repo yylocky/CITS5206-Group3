@@ -60,11 +60,73 @@ Open your preferred web browser and navigate to the localhost address displayed 
 
 ## Unit Tests
 
-Unit tests ensure individual units of the source code (e.g., functions and methods) work as intended. We recommend running the unit tests after any major changes to the codebase. [Details to be provided in Deliverable 3]
+Unit tests ensure individual units of the source code (e.g., functions and methods) work as intended. We use [pytest](https://docs.pytest.org/en/stable/) as our primary tool for running unit tests.
+
+Key Tests Included:
+
+1. Test Model: Comprehensive tests for the models to ensure data integrity, consistency, and reliability.
+2. Update Comment Status Test: This specific test ensures that the comment status is updated correctly, which is crucial to manage and moderate the comments effectively.
+
+How to Run Tests:
+
+1. Ensure that you have `pytest` installed. If not, you can install it using:
+
+   ```
+   pip install pytest
+   ```
+2. To execute the tests, simply run:
+
+   ```
+   pytest
+   ```
+
+   This will automatically discover and run all the test files in the project, providing a detailed report of the tests that passed or faild.
+
+   To run a specific test, use:
+
+   ```
+   pytest <path/to/the/test/file> 
+   ```
+
+**Note:** As we use the test database, we strongly advise you to back up your actual database in production and to always separate your test environment.
 
 ## System Tests
 
-System tests evaluate the system's compliance with specified requirements. They provide end-to-end testing solutions to ensure the entire application functions correctly. [Details to be provided in Deliverable 3]
+System tests evaluate the system's compliance with specified requirements. They provide end-to-end testing solutions to ensure the entire application functions correctly. We utilise [Selenium](https://www.techbeamers.com/selenium-webdriver-python-tutorial/) as our primary tool for conduction system tests.
+
+Key Users Included:
+
+1. HoS and Admin(Same access): Tests are in place to ensure these users can perform functions such as Login, View workload, Export workload, Sort workload, Filter workload, and Assign workload. To run the test, use:kload, Sort workload, Filter workload, Assignworkload. To run the test, use:
+
+   ```
+   python3 <path/to/systemtest_hos.py>
+   ```
+2. HoD: Tests ensure that these users can perform operations like login, view comment history, send comments, read comments, and modify workload. To run the test, use:
+
+   ```
+   python3 <path/to/systemtest_hod.py>
+   ```
+3. Staff: A specific test is in place to ensure that staff members are denied access to assign workloads. To run the test, use:
+
+   ```
+   python3 <path/to/systemtest_staff.py>
+   ```
+
+How to Run Tests:
+
+1. **Selenium Library** : Install the Selenium Python library. You can do this using pip:
+
+   ```
+   pip install selenium
+   ```
+2. **WebDriver** : Depending on the browser and system you intend to use for testing, you'll need the corresponding WebDriver. Here is an example for setup test on Chrome Browser for Mac:
+
+   ```
+   brew install chromedrive
+   ```
+3. Refer[Selenium Webdriver Python Tutorial](https://www.techbeamers.com/selenium-webdriver-python-tutorial/) for more details. Once downloaded, ensure that the WebDriver binary is in your system's PATH or specify its location directly in your test script.
+4. Ensure that you've already started your app and it's running at "[http://127.0.0.1:5000/](http://127.0.0.1:5000/)". If not, please refer to the **How to Launch the Web Application** section.
+5. Execute each test script as indicated in the earlier section.
 
 ## Commit Logs
 
